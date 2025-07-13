@@ -1,6 +1,6 @@
 import * as Realm from 'realm-web'
 
-const REALM_APP_ID = process.env.REACT_APP_MONGO_KEY
+const REALM_APP_ID = import.meta.env.VITE_MONGO_KEY
 // contact developer for .env file for key
 const app = new Realm.App({ id: REALM_APP_ID })
 
@@ -50,7 +50,7 @@ export const getQueueCollection = () => {
   return queue
 }
 
-export const getProfile = async (type) => {
+export const getProfile = async () => {
   if (isLoggedin()) {
     const profile = await app.currentUser
       .mongoClient('mongodb-atlas')
@@ -63,7 +63,7 @@ export const getProfile = async (type) => {
   return null
 }
 
-export const isAdmin = async (type) => {
+export const isAdmin = async () => {
   // admins have email, guests do not
   if (isLoggedin()) {
     return app.currentUser.profile.email !== undefined
@@ -135,4 +135,30 @@ export const updatePhlebotomyCounter = async (seq) => {
     .collection('queueCounters')
     .updateOne({ _id: 'phlebotomyQ3' }, { $set: { seq } })
   return
+}
+
+export const updateStationCounts = async (
+  patientId,
+  visitedStationsCount,
+  eligibleStationsCount,
+  visitedStations = [],
+  eligibleStations = [],
+) => {
+  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
+  await mongoConnection.db('phs').collection('patients').updateOne(
+    { queueNo: patientId },
+    {
+      $set: {
+        visitedStationsCount,
+        eligibleStationsCount,
+        visitedStations,
+        eligibleStations,
+      },
+    },
+  )
+}
+
+export const getPdfQueueCollection = () => {
+  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
+  return mongoConnection.db('phs').collection('pdfQueue')
 }

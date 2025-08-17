@@ -1,26 +1,24 @@
-import { jsPDF } from 'jspdf';
-import { autoTable } from 'jspdf-autotable';
-import mongoDB, { getName, isAdmin } from '../services/mongoDB';
+import { jsPDF } from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
+import mongoDB, { getName, isAdmin } from '../services/mongoDB'
 
-import { bloodpressureQR, bmiQR, tempQR } from 'src/icons/QRCodes';
-import updatedLogo from 'src/icons/UpdatedIcon';
+import { bloodpressureQR, bmiQR, tempQR } from 'src/icons/QRCodes'
+import updatedLogo from 'src/icons/UpdatedIcon'
 
 //import 'jspdf-autotable'
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { updateAllStationCounts } from '../services/stationCounts';
-import { parseFromLangKey, setLang, setLangUpdated } from './langutil';
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+import { updateAllStationCounts } from '../services/stationCounts'
+import { parseFromLangKey, setLang, setLangUpdated } from './langutil'
 
-import { addToFormAQueue, getSavedData, getSavedPatientData } from '../services/mongoDB';
+import { addToFormAQueue, getSavedData, getSavedPatientData } from '../services/mongoDB'
 
-
-import { generateStatusObject } from 'src/components/dashboard/PatientTimeline';
-import allForms from '../forms/forms.json';
-import { checkedBox, uncheckedBox } from '../icons/checked';
-import pic1 from '../icons/pic1-forma';
-import pic2 from '../icons/pic2-forma';
-import { getEligibilityRows } from '../services/stationCounts';
-
+import { generateStatusObject } from 'src/components/dashboard/PatientTimeline'
+import allForms from '../forms/forms.json'
+import { checkedBox, uncheckedBox } from '../icons/checked'
+import pic1 from '../icons/pic1-forma'
+import pic2 from '../icons/pic2-forma'
+import { getEligibilityRows } from '../services/stationCounts'
 
 pdfMake.vfs = pdfFonts.vfs
 
@@ -29,15 +27,15 @@ pdfMake.fonts = {
     normal: 'Roboto-Regular.ttf',
     bold: 'Roboto-Regular.ttf',
     italics: 'Roboto-Regular.ttf',
-    bolditalics: 'Roboto-Regular.ttf'
+    bolditalics: 'Roboto-Regular.ttf',
   },
   fangzhen: {
     normal: 'fzhei-jt.ttf',
     bold: 'fzhei-jt.ttf',
     italics: 'fzhei-jt.ttf',
-    bolditalics: 'fzhei-jt.ttf'
-  }
-};
+    bolditalics: 'fzhei-jt.ttf',
+  },
+}
 
 export async function preRegister(preRegArgs) {
   let gender = preRegArgs.gender
@@ -505,9 +503,9 @@ export function patient(doc, reg, patients, k) {
   // Thanks note
   var thanksNote = doc.splitTextToSize(
     kNewlines((k = k + 2)) +
-    parseFromLangKey('dear', salutation, patients.initials) +
-    '\n' +
-    parseFromLangKey('intro'),
+      parseFromLangKey('dear', salutation, patients.initials) +
+      '\n' +
+      parseFromLangKey('intro'),
     190,
   )
   doc.text(10, 10, thanksNote)
@@ -631,11 +629,11 @@ export function addBloodPressure(doc, triage, k) {
     10,
     10,
     kNewlines((k = k + 1)) +
-    parseFromLangKey('bp_reading') +
-    triage.triageQ7 +
-    '/' +
-    triage.triageQ8 +
-    ' mmHg.',
+      parseFromLangKey('bp_reading') +
+      triage.triageQ7 +
+      '/' +
+      triage.triageQ8 +
+      ' mmHg.',
   )
 
   doc.addImage(bloodpressureQR, 'png', 165, 75, 32, 32)
@@ -1080,7 +1078,7 @@ export function generate_pdf_updated(
   mammobus,
   hpv,
 ) {
-  console.log("TRIAGE", triage);
+  console.log('TRIAGE', triage)
   setLangUpdated(reg.registrationQ14)
   let content = []
 
@@ -1109,7 +1107,9 @@ export function generate_pdf_updated(
       socialService,
     ),
   )
-  content.push(...memoSection(geriAudiometry, dietitiansConsult, geriPtConsult, geriOtConsult, doctorSConsult))
+  content.push(
+    ...memoSection(geriAudiometry, dietitiansConsult, geriPtConsult, geriOtConsult, doctorSConsult),
+  )
   content.push(...recommendationSection())
 
   let fileName = 'Report.pdf'
@@ -1120,17 +1120,21 @@ export function generate_pdf_updated(
   pdfMake.fonts = {
     // download default Roboto font from cdnjs.com
     Roboto: {
-      normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+      normal:
+        'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
       bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
-      italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
-      bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+      italics:
+        'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+      bolditalics:
+        'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf',
     },
 
     NotoTamil: {
       normal: 'https://cdn.jsdelivr.net/gh/choijiwonsoc/my-fonts@main/NotoSansTamil-Regular.ttf',
       bold: 'https://cdn.jsdelivr.net/gh/choijiwonsoc/my-fonts@main/NotoSansTamil-Bold.ttf',
       italics: 'https://cdn.jsdelivr.net/gh/choijiwonsoc/my-fonts@main/NotoSansTamil-Regular.ttf',
-      bolditalics: 'https://cdn.jsdelivr.net/gh/choijiwonsoc/my-fonts@main/NotoSansTamil-Regular.ttf',
+      bolditalics:
+        'https://cdn.jsdelivr.net/gh/choijiwonsoc/my-fonts@main/NotoSansTamil-Regular.ttf',
     },
 
     // example of usage fonts in collection
@@ -1146,39 +1150,62 @@ export function generate_pdf_updated(
     content: content,
     styles: {
       header: {
-        font: (reg.registrationQ14.toLowerCase() === 'tamil' ? 'NotoTamil' : (reg.registrationQ14.toLowerCase() === 'mandarin' ? 'PingFangSC' : 'Roboto')),
+        font:
+          reg.registrationQ14.toLowerCase() === 'tamil'
+            ? 'NotoTamil'
+            : reg.registrationQ14.toLowerCase() === 'mandarin'
+              ? 'PingFangSC'
+              : 'Roboto',
         fontSize: 16,
         bold: true,
         margin: [0, 10, 0, 5],
       },
       subheader: {
-        font: (reg.registrationQ14.toLowerCase() === 'tamil' ? 'NotoTamil' : (reg.registrationQ14.toLowerCase() === 'mandarin' ? 'PingFangSC' : 'Roboto')),
+        font:
+          reg.registrationQ14.toLowerCase() === 'tamil'
+            ? 'NotoTamil'
+            : reg.registrationQ14.toLowerCase() === 'mandarin'
+              ? 'PingFangSC'
+              : 'Roboto',
         fontSize: 13,
         bold: true,
         margin: [0, 3, 0, 3],
       },
       normal: {
-        font: (reg.registrationQ14.toLowerCase() === 'tamil' ? 'NotoTamil' : (reg.registrationQ14.toLowerCase() === 'mandarin' ? 'PingFangSC' : 'Roboto')),
+        font:
+          reg.registrationQ14.toLowerCase() === 'tamil'
+            ? 'NotoTamil'
+            : reg.registrationQ14.toLowerCase() === 'mandarin'
+              ? 'PingFangSC'
+              : 'Roboto',
         fontSize: 10,
         margin: [0, 0, 0, 4],
       },
       italicSmall: {
-        font: (reg.registrationQ14.toLowerCase() === 'tamil' ? 'NotoTamil' : (reg.registrationQ14.toLowerCase() === 'mandarin' ? 'PingFangSC' : 'Roboto')),
+        font:
+          reg.registrationQ14.toLowerCase() === 'tamil'
+            ? 'NotoTamil'
+            : reg.registrationQ14.toLowerCase() === 'mandarin'
+              ? 'PingFangSC'
+              : 'Roboto',
         italics: true,
         fontSize: 10,
       },
     },
     defaultStyle: {
-      font: (reg.registrationQ14.toLowerCase() === 'tamil' ? 'NotoTamil' : (reg.registrationQ14.toLowerCase() === 'mandarin' ? 'PingFangSC' : 'Roboto')),
+      font:
+        reg.registrationQ14.toLowerCase() === 'tamil'
+          ? 'NotoTamil'
+          : reg.registrationQ14.toLowerCase() === 'mandarin'
+            ? 'PingFangSC'
+            : 'Roboto',
       fontSize: 11,
     },
     pageMargins: [40, 60, 40, 60],
   }
 
   pdfMake.createPdf(docDefinition1).download(fileName)
-
 }
-
 
 function patientSection(reg, patients) {
   const salutation = reg.registrationQ1 || 'Dear'
@@ -1207,7 +1234,7 @@ export function temperatureSection(triage) {
     },
     {
       text: `${parseFromLangKey('temp_tip')}`,
-      style: 'normal'
+      style: 'normal',
     },
   ]
 
@@ -1230,7 +1257,6 @@ export function temperatureSection(triage) {
     },
   ]
 }
-
 
 export function bloodPressureSection(triage) {
   const textSection = [
@@ -1327,72 +1353,73 @@ export function bmiSection(height, weight, bmiString) {
 }
 
 export function otherScreeningModularitiesSection(reg, eye, podiatry, vaccine) {
-
   return [
     { text: parseFromLangKey('other_title'), style: 'subheader' },
     { text: `${parseFromLangKey('other_eye')}\n`, style: 'normal' },
     ...(reg?.registrationQ4 >= 60
-      ? [{
-        columns: [
+      ? [
           {
-            width: '70%',
-            style: 'tableExample',
-            margin: [0, 5, 0, 5],
-            table: {
-              widths: ['*', '*', '*'],
-              body: [
-                [
-                  { text: '', style: 'tableHeader' },
-                  {
-                    text: parseFromLangKey('other_eye_tbl_l_header'),
-                    style: 'tableHeader',
-                    bold: true,
-                  },
-                  {
-                    text: parseFromLangKey('other_eye_tbl_r_header'),
-                    style: 'tableHeader',
-                    bold: true,
-                  },
-                ],
-                [
-                  parseFromLangKey('other_eye_tbl_t_row'),
-                  `6/${eye.OphthalQ3}`,
-                  `6/${eye.OphthalQ4}`,
-                ],
-                [
-                  parseFromLangKey('other_eye_tbl_b_row'),
-                  `6/${eye.OphthalQ5}`,
-                  `6/${eye.OphthalQ6}`,
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => 'black',
-              vLineColor: () => 'black',
-            },
+            columns: [
+              {
+                width: '70%',
+                style: 'tableExample',
+                margin: [0, 5, 0, 5],
+                table: {
+                  widths: ['*', '*', '*'],
+                  body: [
+                    [
+                      { text: '', style: 'tableHeader' },
+                      {
+                        text: parseFromLangKey('other_eye_tbl_l_header'),
+                        style: 'tableHeader',
+                        bold: true,
+                      },
+                      {
+                        text: parseFromLangKey('other_eye_tbl_r_header'),
+                        style: 'tableHeader',
+                        bold: true,
+                      },
+                    ],
+                    [
+                      parseFromLangKey('other_eye_tbl_t_row'),
+                      `6/${eye.OphthalQ3}`,
+                      `6/${eye.OphthalQ4}`,
+                    ],
+                    [
+                      parseFromLangKey('other_eye_tbl_b_row'),
+                      `6/${eye.OphthalQ5}`,
+                      `6/${eye.OphthalQ6}`,
+                    ],
+                  ],
+                },
+                layout: {
+                  hLineWidth: () => 0.5,
+                  vLineWidth: () => 0.5,
+                  hLineColor: () => 'black',
+                  vLineColor: () => 'black',
+                },
+              },
+              {
+                width: '*', // takes remaining space
+                text: '', // or you can add other content here or leave blank
+              },
+            ],
           },
-          {
-            width: '*', // takes remaining space
-            text: '', // or you can add other content here or leave blank
-          },
-        ],
-      },
-      { text: '', margin: [0, 5] },
-      { text: `${parseFromLangKey('other_eye_error')} ${eye.OphthalQ8}\n`, style: 'normal' }]
+          { text: '', margin: [0, 5] },
+          { text: `${parseFromLangKey('other_eye_error')} ${eye.OphthalQ8}\n`, style: 'normal' },
+        ]
       : []),
     { text: '', margin: [0, 5] },
-    ...(podiatry?.podiatryQ1 === "Yes"
+    ...(podiatry?.podiatryQ1 === 'Yes'
       ? [{ text: `${parseFromLangKey('podiatry_screening_true')}\n`, style: 'normal' }]
       : []),
-    ...(vaccine?.VAX1 === "Yes"
+    ...(vaccine?.VAX1 === 'Yes'
       ? [{ text: `${parseFromLangKey('vaccine_1')}\n`, style: 'normal' }]
       : []),
-    ...(vaccine?.VAX2 === "Yes"
+    ...(vaccine?.VAX2 === 'Yes'
       ? [{ text: `${parseFromLangKey('vaccine_2')}\n`, style: 'normal', margin: [20, 0, 0, 0] }]
       : []),
-    ...(vaccine?.VAX3 === "Yes"
+    ...(vaccine?.VAX3 === 'Yes'
       ? [{ text: `${parseFromLangKey('vaccine_3')}\n`, style: 'normal', margin: [20, 0, 0, 20] }]
       : []),
   ]
@@ -1426,17 +1453,17 @@ export function followUpSection(
   }
 
   let lungString = null
-  if (lung.LUNG2 == "Yes") {
+  if (lung.LUNG2 == 'Yes') {
     lungString = `${parseFromLangKey('fw_lung')}\n`
   }
 
   let mammobusString = null
-  if (mammobus.mammobusQ1 == "Yes") {
+  if (mammobus.mammobusQ1 == 'Yes') {
     mammobusString = `${parseFromLangKey('fw_mammobus')}\n`
   }
 
   let hpvString = null
-  if (hpv.HPV1 == "Yes") {
+  if (hpv.HPV1 == 'Yes') {
     hpvString = `${parseFromLangKey('fw_hpv')}\n`
   }
 
@@ -1456,7 +1483,7 @@ export function followUpSection(
   }
 
   let aicString = null
-  if (socialService.socialServiceQ4 == "Yes") {
+  if (socialService.socialServiceQ4 == 'Yes') {
     aicString = `${parseFromLangKey('fw_aic')}\n`
   }
 
@@ -1471,8 +1498,8 @@ export function followUpSection(
     //...(vaccineString ? [{ text: vaccineString, style: 'normal' }] : []),
     ...(hsgString ? [{ text: hsgString, style: 'normal' }] : []),
     ...(lungString ? [{ text: lungString, style: 'normal' }] : []),
-    // ...(phlebotomyString ? [{ text: phlebotomyString, style: 'normal' }] : []),
     ,
+    // ...(phlebotomyString ? [{ text: phlebotomyString, style: 'normal' }] : []),
     // ...(fitString ? [{ text: fitString, style: 'normal' }] : []),
     // ...(hpvString ? [{ text: hpvString, style: 'normal' }] : []),
     // ...(nkfString ? [{ text: nkfString, style: 'normal' }] : []),
@@ -1514,7 +1541,6 @@ export function memoSection(audioData, dietData, ptData, otData, doctorData) {
       table: {
         widths: ['*'],
         body: [
-
           [{ text: diet, style: 'normal' }],
           [{ text: pt, style: 'normal' }],
           [{ text: ot, style: 'normal' }],
@@ -1708,22 +1734,35 @@ async function updateGeriGraceEligibility(args, patientId, formCollection, patie
 }
 
 export const generateFormAPdf = async (patientId) => {
-  const [pmhx, hxsocial, reg, hxfamily, triage, hcsr, hxoral, wce, phq, hxm4m5, hxgynae] = await Promise.all([
-    getSavedData(patientId, allForms.hxNssForm),
-    getSavedData(patientId, allForms.hxSocialForm),
-    getSavedData(patientId, allForms.registrationForm),
-    getSavedData(patientId, allForms.hxFamilyForm),
-    getSavedData(patientId, allForms.triageForm),
-    getSavedData(patientId, allForms.hxHcsrForm),
-    getSavedData(patientId, allForms.hxOralForm),
-    getSavedData(patientId, allForms.wceForm),
-    getSavedData(patientId, allForms.geriPhqForm),
-    getSavedData(patientId, allForms.hxM4M5ReviewForm),
-    getSavedData(patientId, allForms.hxGynaeForm),
-  ])
+  const [pmhx, hxsocial, reg, hxfamily, triage, hcsr, hxoral, wce, phq, hxm4m5, hxgynae] =
+    await Promise.all([
+      getSavedData(patientId, allForms.hxNssForm),
+      getSavedData(patientId, allForms.hxSocialForm),
+      getSavedData(patientId, allForms.registrationForm),
+      getSavedData(patientId, allForms.hxFamilyForm),
+      getSavedData(patientId, allForms.triageForm),
+      getSavedData(patientId, allForms.hxHcsrForm),
+      getSavedData(patientId, allForms.hxOralForm),
+      getSavedData(patientId, allForms.wceForm),
+      getSavedData(patientId, allForms.geriPhqForm),
+      getSavedData(patientId, allForms.hxM4M5ReviewForm),
+      getSavedData(patientId, allForms.hxGynaeForm),
+    ])
 
-  const formData = { reg, pmhx, hxsocial, hxfamily, triage, hcsr, hxoral, wce, phq, hxm4m5, hxgynae };
-  const eligibilityRows = getEligibilityRows(formData);
+  const formData = {
+    reg,
+    pmhx,
+    hxsocial,
+    hxfamily,
+    triage,
+    hcsr,
+    hxoral,
+    wce,
+    phq,
+    hxm4m5,
+    hxgynae,
+  }
+  const eligibilityRows = getEligibilityRows(formData)
   const patient = await getSavedPatientData(patientId, 'patients')
 
   const docDefinition = {
@@ -1756,16 +1795,16 @@ export const generateFormAPdf = async (patientId) => {
       pioneerGenSection(reg),
       triageTableSection(triage),
       eligibilitySection(eligibilityRows),
-      ...picSections()
-    ]
-  };
+      ...picSections(),
+    ],
+  }
 
   let fileName = 'Report.pdf'
   if (patient.initials) {
     fileName = patient.initials.split(' ').join('_') + '_FormA.pdf'
   }
   pdfMake.createPdf(docDefinition).download(fileName)
-};
+}
 
 function patientIdSection(patient) {
   return {
@@ -1775,33 +1814,43 @@ function patientIdSection(patient) {
         fontSize: 12,
         bold: true,
         alignment: 'right',
-        margin: [0, -25, 0, 5]
-      }
+        margin: [0, -25, 0, 5],
+      },
     ],
-    margin: [0, 0, 0, 5]
-  };
+    margin: [0, 0, 0, 5],
+  }
 }
 
-function eligibilitySection(eligibilityRows, {pmhx}) {
-
-  const isNutritionistEligible = pmhx?.PMHX5?.includes("Hypertension") || pmhx?.PMHX5?.includes("Hyperlipidemia") || pmhx?.PMHX5?.includes("Diabetes/Pre-Diabetic")
-  const isDieticianEligible = pmhx?.PMHX5?.includes("Kidney Disease") || pmhx?.PMHX5?.includes("Heart disease") || pmhx?.PMHX5?.includes("Others")
-  const dietText =
-  isNutritionistEligible && isDieticianEligible ? "Nutritionist & Dietitians" :
-  isNutritionistEligible ? "Nutritionist" :
-  isDieticianEligible ? "Dietitians" : "";
-
+function eligibilitySection(eligibilityRows) {
   const col1Labels = [
-    '4', '5', '6', '7', '8', '9', '', '', '', '', '10', '11', '12',
-    '13', '14', '15', '16', '17', '18', '19'
-  ];
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '',
+    '',
+    '',
+    '',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    '16',
+    '17',
+    '18',
+    '19',
+  ]
 
   const col2Texts = [
     { label: 'Healthier SG Booth', eligibilityKey: 'Healthier SG Booth' },
     { label: 'Lung Function Testing', eligibilityKey: 'Lung Function Testing' },
     { label: 'Womens Cancer Education', eligibilityKey: "Women's Cancer Education" },
     { label: 'Podiatry', eligibilityKey: 'Podiatry' },
-    { label: 'Nutritionist/Dietitians Consult', eligibilityKey: "Nutritionist's/Dietitian's Consult" },
+    { label: 'Dietitians Consult', eligibilityKey: "Dietitian's Consult" },
     { label: 'Geriatic Screening', eligibilityKey: 'Geriatric Screening' },
     { label: '    Cognitive Function', eligibilityKey: 'Geriatric Screening' }, // grouped under GS
     { label: '    Mobility', eligibilityKey: 'Geriatric Screening' },
@@ -1817,8 +1866,7 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
     { label: 'Vaccination', eligibilityKey: 'Vaccination' },
     { label: 'Doctors Station', eligibilityKey: "Doctor's Station" },
     { label: 'Screening Review', eligibilityKey: '' }, // no eligibility tracking
-  ];
-
+  ]
 
   const col5Texts = [
     {
@@ -1827,25 +1875,23 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           columns: [
             { image: uncheckedBox, width: 10, margin: [-2, 0, 5, 0] },
             { text: 'Have not previously been enrolled in HSG', fontSize: 9 },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
     { text: '' },
     { text: '' },
     { text: '' },
-    (dietText
-    ? { text: `Eligible for: ${dietText}`, fontSize: 9, bold: true }
-    : { text: '' }),
+    { text: '' },
     {
       stack: [
         {
           columns: [
             { image: uncheckedBox, width: 10, margin: [-2, 0, 5, 0] },
-            { text: '>= 60 years old', fontSize: 9 }
-          ]
-        }
-      ]
+            { text: '>= 60 years old', fontSize: 9 },
+          ],
+        },
+      ],
     },
     { text: '' },
     {
@@ -1856,14 +1902,14 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
             { image: uncheckedBox, width: 10, margin: [-2, 0, 2, 0] },
             { text: 'OT Questionnaire (HOMEFAST)', fontSize: 9, margin: [0, 0, 0, 4] },
             { image: uncheckedBox, width: 10, margin: [-2, 0, 2, 0] },
-            { text: 'PT Questionnaire (PAL Qx)', fontSize: 9, margin: [0, 0, 0, 4] }
-          ]
+            { text: 'PT Questionnaire (PAL Qx)', fontSize: 9, margin: [0, 0, 0, 4] },
+          ],
         },
         {
           columns: [
             { image: uncheckedBox, width: 10, margin: [-2, 0, 2, 0] },
             { text: 'Physical Tests (SPPB)', fontSize: 9, margin: [0, 0, 0, 4] },
-          ]
+          ],
         },
         {
           columns: [
@@ -1871,10 +1917,10 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
             { image: uncheckedBox, width: 10, margin: [-2, 0, 2, 0] },
             { text: 'PT Consult', fontSize: 9 },
             { image: uncheckedBox, width: 10, margin: [-2, 0, 2, 0] },
-            { text: 'OT Consult', fontSize: 9 }
-          ]
-        }
-      ]
+            { text: 'OT Consult', fontSize: 9 },
+          ],
+        },
+      ],
     },
     { text: '' },
     { text: '' },
@@ -1886,36 +1932,39 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
     { text: '' },
     { text: 'Part of Geriatric Screening', fontSize: 9 },
     { text: '' },
-    { text: 'Please refer above to part 15A for details on reason(s) for recommendation', fontSize: 9 },
+    {
+      text: 'Please refer above to part 15A for details on reason(s) for recommendation',
+      fontSize: 9,
+    },
     { text: '' },
-  ];
+  ]
 
   const col3Eligible = col2Texts.map(({ eligibilityKey }, i) => {
-    if (i >= 6 && i <= 9) { // Geri screening merged cells
-      return '';
+    if (i >= 6 && i <= 9) {
+      // Geri screening merged cells
+      return ''
     }
-    if (i === 19) { // Screening review
-      return { text: "YES", alignment: 'center', color: 'blue' };
+    if (i === 19) {
+      // Screening review
+      return { text: 'YES', alignment: 'center', color: 'blue' }
     }
-    const eligibility = eligibilityRows.find((r) => r.name === eligibilityKey)?.eligibility;
+    const eligibility = eligibilityRows.find((r) => r.name === eligibilityKey)?.eligibility
     return {
       text: eligibility,
       alignment: 'center',
       color: eligibility === 'YES' ? 'blue' : 'red',
-    };
-  });
+    }
+  })
 
   const col4Eligible = col2Texts.map((_, i) => {
     if (i == 8) {
-      return 'PT Consult:    YES   /   NO';
+      return 'PT Consult:    YES   /   NO'
     } else if (i == 9) {
-      return 'OT Consult:    YES   /   NO';
+      return 'OT Consult:    YES   /   NO'
     } else {
-      return { text: 'YES          /          NO', alignment: 'center' };
+      return { text: 'YES          /          NO', alignment: 'center' }
     }
-  });
-
-
+  })
 
   const sectionTable = {
     table: {
@@ -1923,11 +1972,11 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
       body: [
         // Header row
         [
-          { text: '', bold: true, fontSize: 10, },
-          { text: 'Modality', bold: true, fontSize: 9, },
+          { text: '', bold: true, fontSize: 10 },
+          { text: 'Modality', bold: true, fontSize: 9 },
           { text: 'ELIGIBLE?', bold: true, fontSize: 9, alignment: 'center' },
           { text: 'COMPLETED?', bold: true, fontSize: 9, alignment: 'center' },
-          { text: 'Details', bold: true, fontSize: 9, }
+          { text: 'Details', bold: true, fontSize: 9 },
         ],
         // Rows 0–4: normal
         ...[0, 1, 2, 3, 4].map((i) => [
@@ -1935,7 +1984,7 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           { text: col2Texts[i].label, fontSize: 11 },
           { text: col3Eligible[i], fontSize: 9 },
           { text: col4Eligible[i], fontSize: 9 },
-          col5Texts[i]
+          col5Texts[i],
         ]),
         // Row 5 (Geriatric Screening) with ELIGIBLE? rowSpan=5
         [
@@ -1943,7 +1992,7 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           { text: col2Texts[5].label, fontSize: 11 },
           { ...col3Eligible[5], fontSize: 9, alignment: 'center', rowSpan: 5 },
           { text: col4Eligible[5], fontSize: 9 },
-          col5Texts[5]
+          col5Texts[5],
         ],
         // Row 6 (Cognitive Function)
         [
@@ -1951,7 +2000,7 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           { text: col2Texts[6].label, fontSize: 9, preserveLeadingSpaces: true },
           '', // skip because of rowSpan
           { text: col4Eligible[6], fontSize: 9 },
-          col5Texts[6]
+          col5Texts[6],
         ],
         // Row 7 (Mobility) with rowSpan=3
         [
@@ -1959,7 +2008,7 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           { text: col2Texts[7].label, fontSize: 9, rowSpan: 3, preserveLeadingSpaces: true },
           '', // skip
           { text: col4Eligible[7], fontSize: 9 },
-          col5Texts[7]
+          col5Texts[7],
         ],
         // Rows 8–19: normal
         ...[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19].map((i) => [
@@ -1967,9 +2016,9 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
           { text: col2Texts[i].label, fontSize: 11 },
           { text: col3Eligible[i], fontSize: 9 },
           { text: col4Eligible[i], fontSize: 9 },
-          col5Texts[i]
-        ])
-      ]
+          col5Texts[i],
+        ]),
+      ],
     },
     layout: {
       hLineWidth: () => 0.5,
@@ -1977,9 +2026,9 @@ function eligibilitySection(eligibilityRows, {pmhx}) {
       hLineColor: () => 'black',
       vLineColor: () => 'black',
     },
-    margin: [0, 5, 0, 5]
-  };
-  return sectionTable;
+    margin: [0, 5, 0, 5],
+  }
+  return sectionTable
 }
 
 function chasStatusSection(reg) {
@@ -1989,7 +2038,7 @@ function chasStatusSection(reg) {
     orange: chasStatus === 'CHAS Orange' ? checkedBox : uncheckedBox,
     green: chasStatus === 'CHAS Green' ? checkedBox : uncheckedBox,
     none: chasStatus === 'No CHAS' ? checkedBox : uncheckedBox,
-  };
+  }
 
   // CHAS Status Section
   const chasSection = {
@@ -2001,10 +2050,10 @@ function chasStatusSection(reg) {
             bold: true,
             fontSize: 20,
             margin: [0, -35, 0, 5],
-            alignment: 'center'
-          }
+            alignment: 'center',
+          },
         ],
-        width: 'auto'
+        width: 'auto',
       },
       {
         columns: [
@@ -2013,59 +2062,59 @@ function chasStatusSection(reg) {
               {
                 text: 'CHAS Status:',
                 style: 'sectionSubheader',
-              }
+              },
             ],
             width: 'auto',
-            margin: [0, -5, 0, -5]
+            margin: [0, -5, 0, -5],
           },
           {
             columns: [
               { image: `${chasOptions.blue} `, width: 10 },
-              { text: 'CHAS Blue', style: 'checkboxLabel' }
+              { text: 'CHAS Blue', style: 'checkboxLabel' },
             ],
             width: 'auto',
-            margin: [0, -5, 0, -5]
+            margin: [0, -5, 0, -5],
           },
           {
             columns: [
               { image: `${chasOptions.orange} `, width: 10 },
-              { text: 'CHAS Orange', style: 'checkboxLabel' }
+              { text: 'CHAS Orange', style: 'checkboxLabel' },
             ],
             width: 'auto',
-            margin: [0, -5, 0, -5]
+            margin: [0, -5, 0, -5],
           },
           {
             columns: [
               { image: `${chasOptions.green} `, width: 10 },
-              { text: 'CHAS Green', style: 'checkboxLabel' }
+              { text: 'CHAS Green', style: 'checkboxLabel' },
             ],
             width: 'auto',
-            margin: [0, -5, 0, -5]
+            margin: [0, -5, 0, -5],
           },
           {
             columns: [
               { image: `${chasOptions.none} `, width: 10 },
-              { text: 'No CHAS', style: 'checkboxLabel' }
+              { text: 'No CHAS', style: 'checkboxLabel' },
             ],
             width: 'auto',
-            margin: [0, -5, 0, -5]
+            margin: [0, -5, 0, -5],
           },
         ],
         columnGap: 15,
         // margin: [15, 0, 0, 10]
-      }
+      },
     ],
-    margin: [0, -5, 0, 15]
-  };
-  return chasSection;
+    margin: [0, -5, 0, 15],
+  }
+  return chasSection
 }
 
 function pioneerGenSection(reg) {
-  const isPioneerGen = reg?.registrationQ13 === 'Pioneer generation card holder'; // Default to 'none' if not specified
+  const isPioneerGen = reg?.registrationQ13 === 'Pioneer generation card holder' // Default to 'none' if not specified
   const isPioneerGenOptions = {
     isPioneer: isPioneerGen === true ? checkedBox : uncheckedBox,
     isNotPioneer: isPioneerGen === false ? checkedBox : uncheckedBox,
-  };
+  }
 
   // Pioneer Section
   const pioneerSection = {
@@ -2077,40 +2126,48 @@ function pioneerGenSection(reg) {
               {
                 text: 'Pioneer Generation:',
                 style: 'sectionSubheader',
-              }
+              },
             ],
-            width: 'auto'
+            width: 'auto',
           },
           {
             columns: [
               { image: `${isPioneerGenOptions.isPioneer} `, width: 10 },
-              { text: 'Yes', style: 'checkboxLabel' }
+              { text: 'Yes', style: 'checkboxLabel' },
             ],
-            width: 'auto'
+            width: 'auto',
           },
           {
             columns: [
               { image: `${isPioneerGenOptions.isNotPioneer} `, width: 10 },
-              { text: 'No', style: 'checkboxLabel' }
+              { text: 'No', style: 'checkboxLabel' },
             ],
-            width: 'auto'
+            width: 'auto',
           },
-
         ],
         columnGap: 15,
-        margin: [0, 0, 0, -5]
-      }
+        margin: [0, 0, 0, -5],
+      },
     ],
-    margin: [0, 0, 0, 10]
-  };
-  return pioneerSection;
+    margin: [0, 0, 0, 10],
+  }
+  return pioneerSection
 }
 
 function formatTriage(triage = {}) {
   const {
-    triageQ1, triageQ2, triageQ3, triageQ4,
-    triageQ5, triageQ6, triageQ10, triageQ11,
-    triageQ12, triageQ13, triageQ7, triageQ8
+    triageQ1,
+    triageQ2,
+    triageQ3,
+    triageQ4,
+    triageQ5,
+    triageQ6,
+    triageQ10,
+    triageQ11,
+    triageQ12,
+    triageQ13,
+    triageQ7,
+    triageQ8,
   } = triage
 
   return {
@@ -2121,23 +2178,22 @@ function formatTriage(triage = {}) {
     bp2: `${triageQ3 ?? '___'} / ${triageQ4 ?? '___'}`,
     bp3: `${triageQ5 ?? '___'} / ${triageQ6 ?? '___'}`,
     avgBP: `${triageQ7 ?? '____'} / ${triageQ8 ?? '____'}`,
-    waist: triageQ13 ? `${triageQ13} cm` : '____ cm'
+    waist: triageQ13 ? `${triageQ13} cm` : '____ cm',
   }
 }
 
 function triageTableSection(triage = {}) {
-  const {
-    weightStr, heightStr, bmiStr,
-    bp1, bp2, bp3, avgBP, waist
-  } = formatTriage(triage)
+  const { weightStr, heightStr, bmiStr, bp1, bp2, bp3, avgBP, waist } = formatTriage(triage)
 
   return {
     table: {
       widths: ['15%', '25%', '30%', '30%'], // Adjust widths as needed
       body: [
         [
-          { text: '2. TRIAGE', colSpan: 2, bold: true }, {},
-          { text: '15A. Reasons for recommendation to Doctors Station', colSpan: 2, bold: true }, {}
+          { text: '2. TRIAGE', colSpan: 2, bold: true },
+          {},
+          { text: '15A. Reasons for recommendation to Doctors Station', colSpan: 2, bold: true },
+          {},
         ],
         [
           {
@@ -2145,26 +2201,26 @@ function triageTableSection(triage = {}) {
               {
                 columns: [
                   { text: 'WEIGHT:', bold: true, fontSize: 9 },
-                  { text: weightStr, fontSize: 9, }
+                  { text: weightStr, fontSize: 9 },
                 ],
-                margin: [0, 2, 0, 2]
+                margin: [0, 2, 0, 2],
               },
               {
                 columns: [
                   { text: 'HEIGHT:', bold: true, fontSize: 9 },
-                  { text: heightStr, fontSize: 9, }
+                  { text: heightStr, fontSize: 9 },
                 ],
-                margin: [0, 2, 0, 2]
+                margin: [0, 2, 0, 2],
               },
               {
                 columns: [
                   { text: 'BMI:', bold: true, fontSize: 9 },
-                  { text: bmiStr, fontSize: 9, }
+                  { text: bmiStr, fontSize: 9 },
                 ],
-                margin: [0, 2, 0, 2]
-              }
+                margin: [0, 2, 0, 2],
+              },
             ],
-            margin: [0, 4, 0, 4]
+            margin: [0, 4, 0, 4],
           },
           // Middle column: BP and waist
           {
@@ -2174,39 +2230,39 @@ function triageTableSection(triage = {}) {
                   { text: '1st BP: ', bold: true, fontSize: 9 },
                   { text: `${bp1}      `, fontSize: 9 },
                   { text: '2nd BP: ', bold: true, fontSize: 9 },
-                  { text: `${bp2}`, fontSize: 9 }
+                  { text: `${bp2}`, fontSize: 9 },
                 ],
-                margin: [0, 2, 0, 2]
+                margin: [0, 2, 0, 2],
               },
               {
                 text: [
                   { text: '3rd BP: ', bold: true, fontSize: 9 },
                   { text: `${bp3}      `, fontSize: 9 },
                   { text: 'AVE. BP: ', bold: true, fontSize: 9 },
-                  { text: `${avgBP}`, fontSize: 9 }
+                  { text: `${avgBP}`, fontSize: 9 },
                 ],
-                margin: [0, 2, 0, 2]
+                margin: [0, 2, 0, 2],
               },
               { text: `Waist circumference: ${waist}`, fontSize: 9, margin: [0, 2, 0, 2] },
             ],
-            margin: [0, 4, 0, 4]
+            margin: [0, 4, 0, 4],
           },
           {
             stack: [
               { text: 'Referred from:', fontSize: 9, margin: [0, 2, 0, 2] },
-              { text: 'Reason:', fontSize: 9, margin: [0, 2, 0, 2] }
+              { text: 'Reason:', fontSize: 9, margin: [0, 2, 0, 2] },
             ],
             margin: [0, 4, 0, 4],
           },
           {
             stack: [
               { text: 'Referred from:', fontSize: 9, margin: [0, 2, 0, 2] },
-              { text: 'Reason:', fontSize: 9, margin: [0, 2, 0, 2] }
+              { text: 'Reason:', fontSize: 9, margin: [0, 2, 0, 2] },
             ],
             margin: [0, 4, 0, 4],
           },
-        ]
-      ]
+        ],
+      ],
     },
     layout: {
       hLineWidth: () => 0.5,
@@ -2214,13 +2270,11 @@ function triageTableSection(triage = {}) {
       hLineColor: () => 'black',
       vLineColor: () => 'black',
     },
-    margin: [0, 0, 0, 5]
+    margin: [0, 0, 0, 5],
   }
 }
 
-
-let formAImages = [pic1, pic2];
-
+let formAImages = [pic1, pic2]
 
 // Old picSections function, was changed on 17 Aug 12:45am to accomodate for unwanted page break when patient ID was added to form A
 // Feel free to uncomment this if form A generation is broken
@@ -2242,7 +2296,7 @@ let formAImages = [pic1, pic2];
 // New picSections function to handle unwanted page break after page 1 of Form A
 function picSections() {
   return formAImages
-    .filter(img => !!img)
+    .filter((img) => !!img)
     .map((img, index) => ({
       ...(index > 0 ? { pageBreak: 'before' } : {}),
       stack: [
@@ -2250,9 +2304,9 @@ function picSections() {
           image: img,
           width: 700,
           alignment: 'center',
-        }
+        },
       ],
-    }));
+    }))
 }
 
 export const checkFormA = async (patientId) => {

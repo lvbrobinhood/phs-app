@@ -40,7 +40,7 @@ export const getEligibilityRows = (forms = {}) => {
     hxgynae?.GYNAE16 === 'Yes'
   const isAudiometryEligible = reg?.registrationQ4 >= 60 && hcsr?.hxHcsrQ5 === 'No'
   const isGeriatricScreeningEligible = reg?.registrationQ4 >= 60
-  const isOphthalmologyEligible = reg?.registrationQ4 >= 60
+  const isOphthalmologyEligible = reg?.registrationQ4 >= 60 || hcsr?.hxHcsrQ3 === 'Yes'
 
   const isDoctorStationEligible =
     triage?.triageQ9 === 'Yes' ||
@@ -67,9 +67,11 @@ export const getEligibilityRows = (forms = {}) => {
     pmhx?.PMHX5?.includes('Diabetes/Pre-Diabetic') ||
     hxsocial?.SOCIAL10 === 'Yes' ||
     hxsocial?.SOCIAL11 === 'Yes' ||
+    hxoral?.ORAL1 === 'Poor' ||
     hxoral?.ORAL2 === 'Yes' ||
-    hxoral?.ORAL1 === 'Poor'
-  hxoral?.ORAL4 === 'No' || hxoral?.ORAL5 === 'Yes'
+    hxoral?.ORAL3 === 'Yes' ||
+    hxoral?.ORAL4 === 'No' ||
+    hxoral?.ORAL5 === 'Yes'
 
   return [
     createData('Healthier SG Booth', isHealthierSGEligible),

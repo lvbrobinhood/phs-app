@@ -155,7 +155,7 @@ export default function HxOralForm({ changeTab, nextTab }) {
           />
 
           <Typography variant='subtitle1' fontWeight='bold'>
-            Have you visited a dentist in the past 1 year?
+            Have you visited a dentist in the past 2 years?
           </Typography>
           <FastField
             name='ORAL4'

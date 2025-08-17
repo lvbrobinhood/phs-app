@@ -21,7 +21,8 @@ export const getEligibilityRows = (forms = {}) => {
     eligibility: isEligible ? 'YES' : 'NO',
   })
 
-  const isVaccinationEligible = reg?.registrationQ4 >= 65
+  const isVaccinationEligible = false
+  // reg?.registrationQ4 >= 65 this is vaccine eligibility, cut since PHS event ending
   const isHealthierSGEligible = reg?.registrationQ11 !== 'Yes'
   const isLungFunctionEligible =
     reg?.registrationQ21 === 'Yes' &&

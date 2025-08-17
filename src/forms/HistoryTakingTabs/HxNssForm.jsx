@@ -46,7 +46,7 @@ const formOptions = {
   PMHX3: [
     { label: 'Yes, please specify', value: 'Yes' },
     { label: 'No', value: 'No' },
-    { label: 'Not answered', value: 'No'}
+    { label: 'Not answered', value: 'No' },
   ],
   PMHX4: [
     { label: 'Yes, please specify', value: 'Yes' },
@@ -62,7 +62,7 @@ const formOptions = {
         'Heart disease (includes heart attack, heart failure, heart valve disease, stroke, blood vessel/vascular disease)',
       value: 'Heart disease',
     },
-    { label: 'Others', value: 'Others' },
+    { label: 'Others (eg. Fatty liver / respiratory problems)', value: 'Others' },
   ],
   PMHX7: [
     { label: 'Yes', value: 'Yes' },
@@ -79,7 +79,7 @@ const formOptions = {
   PMHX10: [
     { label: 'Yes, please specify', value: 'Yes' },
     { label: 'No', value: 'No' },
-    { label: 'Not answered', value: 'No'}
+    { label: 'Not answered', value: 'No' },
   ],
 }
 
@@ -291,8 +291,8 @@ export default function HxNssForm({ changeTab, nextTab }) {
             <li>Asymptomatic, and non-compliant</li>
           </ul>
           <Typography>
-            Also refer to Doctor&apos;s Station if participant has not been diagnosed with DM, but has
-            signs of DM (polyuria, polydipsia, periphery neuropathy, blurring of vision etc.)
+            Also refer to Doctor&apos;s Station if participant has not been diagnosed with DM, but
+            has signs of DM (polyuria, polydipsia, periphery neuropathy, blurring of vision etc.)
           </Typography>
 
           <FastField
@@ -373,7 +373,7 @@ export default function HxNssForm({ changeTab, nextTab }) {
 
           <ErrorNotification
             show={submitCount > 0 && Object.keys(errors || {}).length > 0}
-            message="Please fill in all required fields correctly."
+            message='Please fill in all required fields correctly.'
           />
 
           <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
@@ -391,7 +391,5 @@ export default function HxNssForm({ changeTab, nextTab }) {
     </Formik>
   )
 
-
   return <Paper elevation={2}>{renderForm()}</Paper>
 }
-

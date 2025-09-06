@@ -7,7 +7,7 @@ import {
   Paper,
   Stack,
 } from '@mui/material'
-import { getProfile, getPdfQueueCollection } from '../services/mongoDB'
+import { getProfile, getDocPdfQueueCollection } from '../services/mongoDB'
 import { generateDoctorPdf } from '../api/api.jsx'
 
 const DoctorAdmin = () => {
@@ -34,7 +34,7 @@ const DoctorAdmin = () => {
 
         if (!isAdminUser) return
 
-        const collection = getPdfQueueCollection()
+        const collection = getDocPdfQueueCollection()
         const unprinted = await collection.find({ printed: false })
         const printed = await collection.find({ printed: true })
 
@@ -63,7 +63,7 @@ const DoctorAdmin = () => {
 
     const fetchQueue = async () => {
       try {
-        const collection = getPdfQueueCollection()
+        const collection = getDocPdfQueueCollection()
         const unprinted = await collection.find({ printed: false })
         const printed = await collection.find({ printed: true })
 
@@ -95,13 +95,13 @@ const DoctorAdmin = () => {
 
   const handlePrint = async (entry) => {
     await generateDoctorPdf(entry)
-    const collection = getPdfQueueCollection()
+    const collection = getDocPdfQueueCollection()
     await collection.updateOne({ _id: entry._id }, { $set: { printed: true } })
     setRefresh((r) => !r)
   }
 
   const handleRemove = async (entry) => {
-    const collection = getPdfQueueCollection()
+    const collection = getDocPdfQueueCollection()
     await collection.deleteOne({ _id: entry._id })
     setRefresh((r) => !r)
   }

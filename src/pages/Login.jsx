@@ -45,7 +45,7 @@ const Login = () => {
       const data = await res.json();
       if (data.result) {
         alert('Account Created: ' + values.email + '\nYou can now sign in.');
-        setTimeout(() => setIsSignUp(false), 1500);        
+        setTimeout(() => setIsSignUp(false), 1500);
       } else {
         alert('Error: ' + data.error);
       }
@@ -59,6 +59,7 @@ const Login = () => {
   // const handleSignUp = async (values) => {
   //   isLoading(true)
   //   try {
+  //     const email = values.email.trim().toLowerCase();
   //     // Log in as anonymous user if not already logged in
   //     if (!mongoDB.currentUser) {
   //       const credentials = Realm.Credentials.anonymous();
@@ -66,7 +67,7 @@ const Login = () => {
   //     }
   //     const mongoConnection = mongoDB.currentUser.mongoClient('mongodb-atlas');
   //     const guestProfiles = mongoConnection.db('phs').collection('profiles');
-  //     const searchUnique = await guestProfiles.findOne({ username: values.email });
+  //     const searchUnique = await guestProfiles.findOne({ username: email });
   //     if (searchUnique === null) {
   //       if (values.password.length < 6) {
   //         alert('Password must contain at least one six characters!');
@@ -74,18 +75,18 @@ const Login = () => {
   //       } else {
   //         const hashHex = await hashPassword(values.password);
   //         await guestProfiles.insertOne({
-  //           username: values.email,
-  //           email: values.email,
+  //           username: email,
+  //           email: email,
   //           password: hashHex,
   //           is_admin: false,
   //           lastLogin: null,
   //         });
-  //         alert('Account Created: ' + values.email + '\nYou can now sign in.');
+  //         alert('Account Created: ' + email + '\nYou can now sign in.');
   //         setTimeout(() => setIsSignUp(false), 1500);
   //         isLoading(false);
   //       }
   //     } else {
-  //       alert('Username ' + values.email + ' taken! Try another username!');
+  //       alert('Username ' + email + ' taken! Try another username!');
   //       isLoading(false);
   //     }
   //   } catch (e) {
@@ -132,17 +133,18 @@ const Login = () => {
 
   // const handleLogin = async (values) => {
   //   try {
+  //     const email = values.email.trim().toLowerCase();
   //     // fix uid?
   //     isLoading(true)
   //     if (accountOption === accountOptions[1]) {
   //       //admin
-  //       const credentials = Realm.Credentials.emailPassword(values.email, values.password)
+  //       const credentials = Realm.Credentials.emailPassword(email, values.password)
   //       //console.log("test")
   //       // Authenticate the user
   //       // eslint-disable-next-line
   //       const user = await mongoDB.logIn(credentials)
   //       const userProfile = profilesCollection()
-  //       const profile = await userProfile.findOne({ username: values.email })
+  //       const profile = await userProfile.findOne({ username: email }, { $set: { lastLogin: new Date() } })
   //       setProfile(profile)
   //       isLogin(true)
   //     } else {
@@ -365,7 +367,7 @@ const Login = () => {
                   </Button>
                 </Box>
 
-                
+
 
                 {/* Reset Password only for Sign In and Admin */}
                 {!isSignUp && accountOption === accountOptions[1] && (

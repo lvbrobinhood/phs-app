@@ -30,7 +30,7 @@ export const logOut = async () => {
   try {
     localStorage.removeItem('authToken');
     localStorage.removeItem('profile');
-    
+
   } catch (error) {
     console.error('Error logging out:', error)
   }
@@ -314,16 +314,25 @@ export const updateStationCounts = async (
   }
 }
 
-// export const getPdfQueueCollection = () => {
-//   const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
-//   return mongoConnection.db('phs').collection('pdfQueue')
-// }
+export const getDocPdfQueueCollection = () => {
+  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
+  return mongoConnection.db('phs').collection('docPdfQueue')
+}
 
-export const getPdfQueueCollection = async () => {
-  try {
-    const res = await apiGet('/pdfQueue')
-    return res.data || []
-  } catch {
-    return []
-  }
+export const getFormAPdfQueueCollection = () => {
+  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
+  return mongoConnection.db('phs').collection('formAPdfQueue')
+}
+
+export const addToFormAQueue = async (patientId) => {
+  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
+  const queue = mongoConnection.db('phs').collection('formAPdfQueue')
+
+  await queue.insertOne({
+    patientId: patientId,
+    printed: false,
+    createdAt: new Date(),
+  })
+
+
 }

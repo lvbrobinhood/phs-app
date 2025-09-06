@@ -18,6 +18,7 @@ import SocialServiceForm from 'src/forms/SocialServiceForm'
 import HxTabs from './forms/HistoryTakingTabs/HistoryTaking'
 import ManageVolunteers from 'src/pages/ManageVolunteers'
 import DoctorAdmin from 'src/pages/DoctorAdmin'
+import FormAAdmin from 'src/pages/FormAAdmin'
 import Edit from 'src/pages/EditForms'
 import SummaryForm from 'src/forms/SummaryForm'
 import React from 'react'
@@ -29,10 +30,12 @@ import MentalHealthForm from './forms/MentalHealthTabs/MentalHealthMain'
 import HpvForm from './forms/HpvForm'
 import VaccineForm from './forms/VaccineForm'
 import WceTabs from './forms/WceTabs/WceMain'
-import GeriAudiometryForm from './forms/GeriAudiometryForm'
-import GeriVisionForm from './forms/GeriVisionForm'
+import AudiometryForm from './forms/AudiometryForm'
+import OphthalForm from './forms/OphthalForm'
 import GeriMobilityTabs from './forms/GeriMobilityTabs/GeriMobility'
 import GeriCognitiveTabs from './forms/GeriCognitiveTabs/GeriCognitive'
+import MammobusForm from './forms/MammobusForm'
+import PodiatryForm from './forms/PodiatryForm'
 
 import Eligibility from './pages/Eligibility'
 
@@ -52,8 +55,8 @@ const routes = [
       { path: 'reg', element: <RegForm /> },
       { path: 'vax', element: <VaccineForm /> },
       { path: 'hsg', element: <HsgForm /> },
-      { path: 'geriaudio', element: <GeriAudiometryForm /> },
-      { path: 'gerivision', element: <GeriVisionForm /> },
+      { path: 'audio', element: <AudiometryForm /> },
+      { path: 'ophthal', element: <OphthalForm /> },
       { path: 'gericog', element: <GeriCognitiveTabs /> },
       { path: 'triage', element: <TriageForm /> },
       { path: 'osteoporosis', element: <OsteoForm /> },
@@ -68,7 +71,11 @@ const routes = [
       { path: 'queue', element: <Queue /> },
       { path: 'eligibility', element: <Eligibility /> },
       { path: '*', element: <Navigate to='/404' /> },
-      { path: 'docadmin', element: <DoctorAdmin />}
+      { path: 'docadmin', element: <DoctorAdmin /> },
+      { path: 'mammobus', element: <MammobusForm /> },
+      { path: 'podiatry', element: <PodiatryForm /> },
+      { path: 'formAadmin', element: <FormAAdmin />}
+
     ],
   },
   {

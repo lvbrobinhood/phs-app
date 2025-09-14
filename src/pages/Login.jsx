@@ -55,47 +55,6 @@ const Login = () => {
     isLoading(false);
   }
 
-  // we need to allow anonymous users to sign up(settle in mongoDB)
-  // const handleSignUp = async (values) => {
-  //   isLoading(true)
-  //   try {
-  //     const email = values.email.trim().toLowerCase();
-  //     // Log in as anonymous user if not already logged in
-  //     if (!mongoDB.currentUser) {
-  //       const credentials = Realm.Credentials.anonymous();
-  //       await mongoDB.logIn(credentials);
-  //     }
-  //     const mongoConnection = mongoDB.currentUser.mongoClient('mongodb-atlas');
-  //     const guestProfiles = mongoConnection.db('phs').collection('profiles');
-  //     const searchUnique = await guestProfiles.findOne({ username: email });
-  //     if (searchUnique === null) {
-  //       if (values.password.length < 6) {
-  //         alert('Password must contain at least one six characters!');
-  //         isLoading(false);
-  //       } else {
-  //         const hashHex = await hashPassword(values.password);
-  //         await guestProfiles.insertOne({
-  //           username: email,
-  //           email: email,
-  //           password: hashHex,
-  //           is_admin: false,
-  //           lastLogin: null,
-  //         });
-  //         alert('Account Created: ' + email + '\nYou can now sign in.');
-  //         setTimeout(() => setIsSignUp(false), 1500);
-  //         isLoading(false);
-  //       }
-  //     } else {
-  //       alert('Username ' + email + ' taken! Try another username!');
-  //       isLoading(false);
-  //     }
-  //   } catch (e) {
-  //     alert('Contact Developer: ' + e);
-  //     isLoading(false);
-  //   }
-  // }
-
-
   // login API version
   const handleLogin = async (values) => {
     isLoading(true)
@@ -130,54 +89,6 @@ const Login = () => {
     }
     isLoading(false);
   }
-
-  // const handleLogin = async (values) => {
-  //   try {
-  //     const email = values.email.trim().toLowerCase();
-  //     // fix uid?
-  //     isLoading(true)
-  //     if (accountOption === accountOptions[1]) {
-  //       //admin
-  //       const credentials = Realm.Credentials.emailPassword(email, values.password)
-  //       //console.log("test")
-  //       // Authenticate the user
-  //       // eslint-disable-next-line
-  //       const user = await mongoDB.logIn(credentials)
-  //       const userProfile = profilesCollection()
-  //       const profile = await userProfile.findOne({ username: email }, { $set: { lastLogin: new Date() } })
-  //       setProfile(profile)
-  //       isLogin(true)
-  //     } else {
-  //       const hashHex = await hashPassword(values.password)
-
-  //       const credentials = Realm.Credentials.function({
-  //         username: values.email,
-  //         password: hashHex,
-  //       })
-
-  //       // Authenticate the user
-  //       // eslint-disable-next-line
-  //       const user = await mongoDB.logIn(credentials)
-  //       const userProfile = profilesCollection()
-  //       const profile = await userProfile.findOne({ username: values.email })
-  //       isLogin(true)
-  //       setProfile(profile)
-  //     }
-  //     const userProfile = profilesCollection()
-  //     await userProfile.updateOne(
-  //       {
-  //         username: values.email,
-  //       },
-  //       { $set: { lastLogin: new Date() } },
-  //     )
-  //     isLoading(false)
-  //     navigate('/app/registration', { replace: true })
-  //   } catch (err) {
-  //     isLoading(false)
-  //     alert('Invalid Username or Password!')
-  //   }
-  //   isLoading(false)
-  // }
 
   const handleReset = async (values) => {
     // const email = values.email

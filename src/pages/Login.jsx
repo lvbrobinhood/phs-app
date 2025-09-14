@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import * as Yup from 'yup'
@@ -17,10 +16,11 @@ import {
 import { useContext, useState } from 'react'
 import { LoginContext } from '../App.jsx'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { apiPost } from '../apiClient.js'
 
 const Login = () => {
   const navigate = useNavigate()
-  const [accountOptions, /*setAccountOptions*/] = useState(['Guest', 'Admin'])
+  const [accountOptions /*setAccountOptions*/] = useState(['Guest', 'Admin'])
   const [accountOption, setAccountOption] = useState('Guest')
   const { isLogin } = useContext(LoginContext)
   const { setProfile } = useContext(LoginContext)
@@ -30,64 +30,58 @@ const Login = () => {
   const handleClickShowPassword = () => setShowPassword(!showPassword)
   const handleMouseDownPassword = () => setShowPassword(!showPassword)
 
-
   // sign up API version
   const handleSignUp = async (values) => {
     isLoading(true)
     try {
-      const res = await fetch('/api/handleSignup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: values.email, password: values.password }),
-      });
-      const data = await res.json();
+      const data = await apiPost('/handleSignup', {
+        email: values.email,
+        password: values.password,
+      })
+
       if (data.result) {
-        alert('Account Created: ' + values.email + '\nYou can now sign in.');
-        setTimeout(() => setIsSignUp(false), 1500);
+        alert('Account Created: ' + values.email + '\nYou can now sign in.')
+        setTimeout(() => setIsSignUp(false), 1)
       } else {
-        alert('Error: ' + data.error);
+        alert('Error: ' + data.error)
       }
     } catch (e) {
-        alert('Contact Developer: ' + e);
+      alert('Contact Developer: ' + e.message)
     }
-    isLoading(false);
+    isLoading(false)
   }
 
   // login API version
   const handleLogin = async (values) => {
     isLoading(true)
     try {
-      let type = 'Guest';
+      let type = 'Guest'
       if (accountOption === accountOptions[1]) {
-        type = 'Admin';
+        type = 'Admin'
       }
-      const res = await fetch('/api/handleLogin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: values.email, password: values.password, type: type }),
-      });
 
-      const data = await res.json();
+      const data = await apiPost('/handleLogin', {
+        email: values.email,
+        password: values.password,
+        type: type,
+      })
+
       if (data.result) {
         if (data.token) {
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('authToken', data.token)
         }
-        alert('Login successful!');
-        localStorage.setItem('profile', JSON.stringify(data.user));
-        setProfile(data.user);
-        isLogin(true);
-        navigate('/app/registration', { replace: true });
+        alert('Login successful!')
+        localStorage.setItem('profile', JSON.stringify(data.user))
+        setProfile(data.user)
+        isLogin(true)
+        navigate('/app/registration', { replace: true })
       } else {
-        alert(data.error || 'Invalid Username or Password!');
+        alert(data.error || 'Invalid username or password!')
       }
     } catch (e) {
-      alert('Login error!');
+      alert('Login error: ' + e.message + ' Invalid username or password!')
     }
-    isLoading(false);
+    isLoading(false)
   }
 
   const handleReset = async (values) => {
@@ -98,31 +92,31 @@ const Login = () => {
     // } catch (e) {
     //   alert('Invalid Email!')
     // }
-    alert('Password reset is not implemented yet.');
+    alert('Password reset is not implemented yet.')
   }
 
   const connectionTest = async () => {
     try {
-      const res = await fetch('/api/test-mongo');
-      const data = await res.json();
+      const res = await fetch('/api/test-mongo')
+      const data = await res.json()
       if (data.result) {
-        console.log('MongoDB Test:', data.message, data.collections);
-        alert('MongoDB connection successful!');
+        console.log('MongoDB Test:', data.message, data.collections)
+        alert('MongoDB connection successful!')
       } else {
-        console.error('MongoDB Test Failed:', data.error);
-        alert('MongoDB connection failed!');
+        console.error('MongoDB Test Failed:', data.error)
+        alert('MongoDB connection failed!')
       }
     } catch (e) {
-      console.error('MongoDB Test Error:', e);
-      alert('MongoDB test error!');
+      console.error('MongoDB Test Error:', e)
+      alert('MongoDB test error!')
     }
   }
 
   return (
-     <>
+    <>
       <Button
-        variant="outlined"
-        color="secondary"
+        variant='outlined'
+        color='secondary'
         onClick={connectionTest}
         style={{ marginTop: 16 }}
       >
@@ -170,14 +164,7 @@ const Login = () => {
               }
             }}
           >
-            {({
-              errors,
-              handleBlur,
-              handleChange,
-              handleSubmit,
-              touched,
-              values,
-            }) => (
+            {({ errors, handleBlur, handleChange, handleSubmit, touched, values }) => (
               <form onSubmit={handleSubmit}>
                 <Box sx={{ mb: 3 }}>
                   <Typography color='textPrimary' variant='h2'>
@@ -269,16 +256,16 @@ const Login = () => {
                   >
                     {loading ? (
                       <>
-                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                        <CircularProgress size={24} color='inherit' sx={{ mr: 1 }} />
                         {isSignUp ? 'Signing up...' : 'Logging in...'}
                       </>
+                    ) : isSignUp ? (
+                      'Sign up'
                     ) : (
-                      isSignUp ? 'Sign up' : 'Sign in now'
+                      'Sign in now'
                     )}
                   </Button>
                 </Box>
-
-
 
                 {/* Reset Password only for Sign In and Admin */}
                 {!isSignUp && accountOption === accountOptions[1] && (
@@ -298,19 +285,11 @@ const Login = () => {
                 {/* Toggle between Sign In and Sign Up */}
                 <Box sx={{ textAlign: 'center', mt: 2 }}>
                   {!isSignUp ? (
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => setIsSignUp(true)}
-                    >
+                    <Link component='button' variant='body2' onClick={() => setIsSignUp(true)}>
                       Don&apos;t have an account? Sign up here.
                     </Link>
                   ) : (
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => setIsSignUp(false)}
-                    >
+                    <Link component='button' variant='body2' onClick={() => setIsSignUp(false)}>
                       Already have an account? Sign in here.
                     </Link>
                   )}

@@ -7,8 +7,9 @@ function authHeaders() {
 
 export async function apiGet(path) {
   const res = await fetch(`${API_BASE}${path}`, { headers: { ...authHeaders() } });
-  if (!res.ok) throw new Error(res.status);
-  return res.json();
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
 }
 
 export async function apiPost(path, body) {
@@ -17,6 +18,9 @@ export async function apiPost(path, body) {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error(res.status);
-  return res.json();
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
 }

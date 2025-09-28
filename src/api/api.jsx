@@ -183,6 +183,8 @@ export async function submitForm(args, patientId, formCollection) {
   try {
     // Registers the patient in the patients collection if they do not exist yet
     let effectiveId = patientId
+    let patientData = {}
+
     if (effectiveId === -1 || effectiveId == null) {
       const payload = {
         gender: args.registrationQ5,
@@ -193,18 +195,29 @@ export async function submitForm(args, patientId, formCollection) {
       const created = await apiPost('/patients', payload)
       if (!created?.result) return { result: false, error: 'Failed to create patient' }
       effectiveId = created.data.queueNo
+      patientData = payload
+    } else {
+      patientData = {
+        gender: args.registrationQ5,
+        initials: args.registrationQ2,
+        age: args.registrationQ4,
+        preferredLanguage: args.registrationQ14,
+      }
     }
 
     // Upsert form data
-    const upsert = await apiPost(`/forms/${encodeURIComponent(formCollection)}/${encodeURIComponent(effectiveId)}`, {
-      data: args,
-    })
+    const upsert = await apiPost(
+      `/forms/${encodeURIComponent(formCollection)}/${encodeURIComponent(effectiveId)}`,
+      {
+        data: args,
+      },
+    )
     if (!upsert?.result) return { result: false, error: 'Failed to save form' }
 
-    // Return same shape your caller expects
+    // Return same shape expected by frontend logic
     return {
       result: true,
-      data: { ...args, patientId: effectiveId },
+      data: patientData,
       qNum: effectiveId,
     }
   } catch (err) {
@@ -212,39 +225,7 @@ export async function submitForm(args, patientId, formCollection) {
   }
 }
 
-export async function submitFormSpecial(args, patientId, formCollection) {
-  try {
-    const mongoConnection = mongoDB.currentUser.mongoClient('mongodb-atlas')
-    const patientsRecord = mongoConnection.db('phs').collection('patients')
-    const record = await patientsRecord.findOne({ queueNo: patientId })
-    if (record) {
-      const registrationForms = mongoConnection.db('phs').collection(formCollection)
-      if (record[formCollection] === undefined) {
-        // first time form is filled, create document for form
-        await patientsRecord.updateOne(
-          { queueNo: patientId },
-          { $set: { [formCollection]: patientId } },
-        )
-        await registrationForms.insertOne({ _id: patientId, ...args })
-        await updateAllStationCounts(patientId)
-        return { result: true }
-      } else {
-        args.lastEdited = new Date()
-        args.lastEditedBy = getName()
-        await registrationForms.updateOne({ _id: patientId }, { $set: { ...args } })
-        await updateAllStationCounts(patientId)
-
-        return { result: true }
-      }
-    } else {
-      const errorMsg = 'An error has occurred.'
-      return { result: false, error: errorMsg }
-    }
-  } catch (err) {
-    return { result: false, error: err }
-  }
-}
-
+// UNUSED IN 2025, not sure what is the purpose of this
 export async function submitPreRegForm(args, patientId, formCollection) {
   try {
     const mongoConnection = mongoDB.currentUser.mongoClient('mongodb-atlas')

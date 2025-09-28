@@ -310,11 +310,6 @@ export const updateStationCounts = async (
   }
 }
 
-export const getDocPdfQueueCollection = () => {
-  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
-  return mongoConnection.db('phs').collection('docPdfQueue')
-}
-
 // Get unprinted documents from docPdfQueue
 export const getUnprintedDocPdfQueue = async () => {
   if (!isLoggedin()) return [];
@@ -336,6 +331,23 @@ export const getPrintedDocPdfQueue = async () => {
   } catch (error) {
     console.error('Error fetching printed doc queue:', error);
     return [];
+  }
+};
+
+// Add patient's Doctor Consult PDF to docPdfQueue
+export const addToDocPdfQueue = async (patientId, doctorName) => {
+  if (!isLoggedin()) return false;
+  try {
+    await apiPost('/docPdfQueue', {
+      patientId,
+      doctorName,
+      printed: false,
+      createdAt: new Date()
+    });
+    return true;
+  } catch (error) {
+    console.error('Error adding to doctor PDF queue:', error);
+    return false;
   }
 };
 
@@ -363,20 +375,62 @@ export const deleteDocPdfFromQueue = async (docId) => {
   }
 };
 
-export const getFormAPdfQueueCollection = () => {
-  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
-  return mongoConnection.db('phs').collection('formAPdfQueue')
-}
+// Get unprinted Form A documents from formAPdfQueue
+export const getUnprintedFormAPdfQueue = async () => {
+  if (!isLoggedin()) return [];
+  try {
+    const response = await apiGet('/formAPdfQueue');
+    return response.data || [];
+  } catch (error) {
+    console.error('Error fetching unprinted Form A queue:', error);
+    return [];
+  }
+};
 
+// Get printed Form A documents from formAPdfQueue
+export const getPrintedFormAPdfQueue = async () => {
+  if (!isLoggedin()) return [];
+  try {
+    const response = await apiGet('/formAPdfQueue/printed');
+    return response.data || [];
+  } catch (error) {
+    console.error('Error fetching printed Form A queue:', error);
+    return [];
+  }
+};
+
+// Add patient to Form A queue
 export const addToFormAQueue = async (patientId) => {
-  const mongoConnection = app.currentUser.mongoClient('mongodb-atlas')
-  const queue = mongoConnection.db('phs').collection('formAPdfQueue')
+  if (!isLoggedin()) return false;
+  try {
+    await apiPost('/formAPdfQueue', { patientId });
+    return true;
+  } catch (error) {
+    console.error('Error adding to Form A queue:', error);
+    return false;
+  }
+};
 
-  await queue.insertOne({
-    patientId: patientId,
-    printed: false,
-    createdAt: new Date(),
-  })
+// Mark Form A document as printed
+export const markFormAAsPrinted = async (docId) => {
+  if (!isLoggedin()) return false;
+  try {
+    await apiPatch(`/formAPdfQueue/${docId}`, {});
+    return true;
+  } catch (error) {
+    console.error('Error marking Form A as printed:', error);
+    return false;
+  }
+};
 
-
-}
+// Delete Form A document from queue
+export const deleteFormAFromQueue = async (docId) => {
+  if (!isLoggedin()) return false;
+  try {
+    await apiDelete(`/formAPdfQueue/${docId}`);
+    return true;
+  } catch (error) {
+    console.error('Error deleting Form A from queue:', error);
+    return false;
+  }
+};

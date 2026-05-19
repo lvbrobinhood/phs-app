@@ -17,6 +17,7 @@ src/api/authApi.js       # Login, signup, account deletion, password reset
 src/api/formsApi.js      # Patient form reads and submissions
 src/api/patientsApi.js   # Patient creation, lookup, names, and search
 src/api/stationsApi.js   # Patient station completion status and eligibility
+src/services/stationParity.js # Dev-only backend/frontend eligibility comparison helper
 ```
 
 Form components may still pass legacy collection names such as `registrationForm` or `triageForm`. The bridge in `src/forms/formKeys.js` maps those names to backend form keys such as `registration` and `triage`.
@@ -27,9 +28,11 @@ For new frontend work:
 
 - Use `patientsApi`, `formsApi`, and `authApi` instead of direct `fetch('/api/...')`.
 - Use `stationsApi.getPatientStationStatus` for dashboard completion status and `stationsApi.getPatientStationEligibility` for backend eligibility. The current timeline keeps local fallbacks while backend parity is being validated.
+- In development, the dashboard logs station eligibility mismatches found by `stationParity.js`.
 - Avoid passing MongoDB collection names from UI components when a domain key is available.
 - Add new form collection-to-key mappings in `src/forms/formKeys.js`.
 - Keep `services/mongoDB.js` compatibility behavior until old callers have been migrated.
+- `src/services/stationCounts.js` still exposes compatibility helpers. `updateAllStationCounts` now prefers backend eligibility and falls back to local rules.
 
 ## Past Versions
 

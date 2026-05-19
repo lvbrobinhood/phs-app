@@ -12,7 +12,7 @@ import NotoSansSC_Bold from './lang/NotoSansSC-bold'
 var langFile = en_us
 
 export function setLang(doc, langName) {
-    langName = langName.toLowerCase()
+    langName = normalizeLangName(langName)
     switch(langName) {
         case "english":
             langFile = en_us
@@ -43,7 +43,7 @@ export function setLang(doc, langName) {
 }
 
 export function setLangUpdated(langName) {
-    langName = langName.toLowerCase()
+    langName = normalizeLangName(langName)
     switch(langName) {
         case "english":
             langFile = en_us
@@ -77,4 +77,8 @@ export function parseFromLangKey(key, ...args) {
         text = text.replace(`{${index}}`, val)
     }
     return text
+}
+
+export function normalizeLangName(langName) {
+    return String(langName || 'english').toLowerCase()
 }

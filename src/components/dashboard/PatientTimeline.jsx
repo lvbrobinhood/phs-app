@@ -11,8 +11,9 @@ import { isAdmin } from '../../services/mongoDB'
 import { ScrollTopContext } from '../../api/utils.js'
 import CircularProgress from '@mui/material/CircularProgress'
 import { Box, Card, CardContent, CardHeader, Divider } from '@mui/material'
-import { apiGet } from 'src/apiClient'
-import PodiatryForm from 'src/forms/PodiatryForm'
+import { getPatient } from 'src/api/patientsApi'
+import { getPatientStationEligibility, getPatientStationStatus } from 'src/api/stationsApi'
+import { compareStationEligibility } from 'src/services/stationParity'
 
 // Timeline item configuration - add/delete stations here (comment out)
 const timelineItems = [
@@ -200,18 +201,52 @@ const BasicTimeline = (props) => {
     //     navigate('/app/registration', { replace: true })
     //   }
     // }
-    const createFormsStatus = async () => {
-    try {
-      const res = await apiGet(`/patients/${props.patientId}?collection=patients`)
-      const record = res.data
-      setFormDone(generateStatusObject(record))
-      setLoading(false)
-      isAdmins(await isAdmin())
-    } catch (err) {
-      alert(err)
-      navigate('/app/registration', { replace: true })
+    const loadLocalStatusFallback = async () => {
+      const res = await getPatient(props.patientId)
+      return generateStatusObject(res.data)
     }
-  }
+
+    const createFormsStatus = async () => {
+      try {
+        let status
+        try {
+          const res = await getPatientStationStatus(props.patientId)
+          status = res.data
+          try {
+            const eligibilityRes = await getPatientStationEligibility(props.patientId)
+            status = {
+              ...status,
+              eligibleStations: eligibilityRes.data?.eligibleStations || status.eligibleStations,
+            }
+            if (import.meta.env.DEV) {
+              compareStationEligibility(props.patientId)
+                .then((comparison) => {
+                  if (!comparison.matches) {
+                    console.warn('Station eligibility mismatch', {
+                      patientId: comparison.patientId,
+                      differences: comparison.differences,
+                      frontendEligibleStations: comparison.frontendEligibleStations,
+                      backendEligibleStations: comparison.backendEligibleStations,
+                    })
+                  }
+                })
+                .catch(() => {})
+            }
+          } catch {
+            // Keep backend completion status even if backend eligibility is unavailable.
+          }
+        } catch {
+          status = await loadLocalStatusFallback()
+        }
+
+        setFormDone(status)
+        setLoading(false)
+        isAdmins(await isAdmin())
+      } catch (err) {
+        alert(err)
+        navigate('/app/registration', { replace: true })
+      }
+    }
     createFormsStatus()
   }, [navigate, props.patientId])
   if (loading) {

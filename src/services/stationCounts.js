@@ -1,4 +1,5 @@
 import allForms from '../forms/forms.json'
+import { getPatientStationEligibility } from '../api/stationsApi'
 import { getSavedData, getSavedPatientData, updateStationCounts } from './mongoDB'
 
 export const getEligibilityRows = (forms = {}) => {
@@ -150,10 +151,35 @@ export const updateAllStationCounts = async (patientId) => {
   // fetch patient record (used for visited station logic)
   const patient = await getSavedPatientData(patientId, 'patients')
   const visitedStationsCount = computeVisitedStationsCount(patient)
+  let eligibleStations = []
+  let eligibleStationsCount = 0
+  let usedBackendEligibility = false
 
-  // fetch all relevant forms for eligibility
-  const [pmhx, hxsocial, reg, hxfamily, triage, hcsr, hxoral, wce, phq, hxm4m5, hxgynae, ophthal] =
-    await Promise.all([
+  try {
+    const eligibility = await getPatientStationEligibility(patientId)
+    eligibleStations = eligibility.data?.eligibleStations || []
+    eligibleStationsCount = eligibleStations.length
+    usedBackendEligibility = true
+  } catch {
+    usedBackendEligibility = false
+  }
+
+  if (!usedBackendEligibility) {
+    // fetch all relevant forms for eligibility
+    const [
+      pmhx,
+      hxsocial,
+      reg,
+      hxfamily,
+      triage,
+      hcsr,
+      hxoral,
+      wce,
+      phq,
+      hxm4m5,
+      hxgynae,
+      ophthal,
+    ] = await Promise.all([
       getSavedData(patientId, allForms.hxNssForm),
       getSavedData(patientId, allForms.hxSocialForm),
       getSavedData(patientId, allForms.registrationForm),
@@ -168,25 +194,26 @@ export const updateAllStationCounts = async (patientId) => {
       getSavedData(patientId, allForms.ophthalForm),
     ])
 
-  const formData = {
-    reg: reg || {},
-    pmhx: pmhx || {},
-    hxsocial: hxsocial || {},
-    hxfamily: hxfamily || {},
-    triage: triage || {},
-    hcsr: hcsr || {},
-    hxoral: hxoral || {},
-    wce: wce || {},
-    phq: phq || {},
-    hxm4m5: hxm4m5 || {},
-    hxgynae: hxgynae || {},
-    ophthal: ophthal || {},
+    const formData = {
+      reg: reg || {},
+      pmhx: pmhx || {},
+      hxsocial: hxsocial || {},
+      hxfamily: hxfamily || {},
+      triage: triage || {},
+      hcsr: hcsr || {},
+      hxoral: hxoral || {},
+      wce: wce || {},
+      phq: phq || {},
+      hxm4m5: hxm4m5 || {},
+      hxgynae: hxgynae || {},
+      ophthal: ophthal || {},
+    }
+
+    const rows = getEligibilityRows(formData)
+    eligibleStationsCount = rows.filter((r) => r.eligibility === 'YES').length
+    eligibleStations = getEligibleStationNames(formData)
   }
 
-  const rows = getEligibilityRows(formData)
-  const eligibleStationsCount = rows.filter((r) => r.eligibility === 'YES').length
-
-  const eligibleStations = getEligibleStationNames(formData)
   const visitedStations = getVisitedStationNames(patient)
 
   await updateStationCounts(

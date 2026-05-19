@@ -7,7 +7,7 @@ function authHeaders() {
 
 export async function apiGet(path) {
   const res = await fetch(`${API_BASE}${path}`, { headers: { ...authHeaders() } });
-  const data = await res.json()
+  const data = await parseResponse(res)
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
@@ -19,7 +19,7 @@ export async function apiPost(path, body) {
     body: JSON.stringify(body)
   });
 
-  const data = await res.json();
+  const data = await parseResponse(res);
 
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
@@ -32,7 +32,7 @@ export async function apiPatch(path, body) {
     body: JSON.stringify(body)
   });
 
-  const data = await res.json();
+  const data = await parseResponse(res);
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
@@ -43,7 +43,22 @@ export async function apiDelete(path) {
     headers: { ...authHeaders() }
   });
 
-  const data = await res.json();
+  const data = await parseResponse(res);
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
+}
+
+async function parseResponse(res) {
+  const text = await res.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      error: `Expected JSON from API but received: ${text.slice(0, 120)}`,
+    };
+  }
 }

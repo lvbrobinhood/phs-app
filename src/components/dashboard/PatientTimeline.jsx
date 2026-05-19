@@ -12,6 +12,7 @@ import { ScrollTopContext } from '../../api/utils.js'
 import CircularProgress from '@mui/material/CircularProgress'
 import { Box, Card, CardContent, CardHeader, Divider } from '@mui/material'
 import { getPatient } from 'src/api/patientsApi'
+import { getPatientStationStatus } from 'src/api/stationsApi'
 
 // Timeline item configuration - add/delete stations here (comment out)
 const timelineItems = [
@@ -199,18 +200,29 @@ const BasicTimeline = (props) => {
     //     navigate('/app/registration', { replace: true })
     //   }
     // }
-    const createFormsStatus = async () => {
-    try {
+    const loadLocalStatusFallback = async () => {
       const res = await getPatient(props.patientId)
-      const record = res.data
-      setFormDone(generateStatusObject(record))
-      setLoading(false)
-      isAdmins(await isAdmin())
-    } catch (err) {
-      alert(err)
-      navigate('/app/registration', { replace: true })
+      return generateStatusObject(res.data)
     }
-  }
+
+    const createFormsStatus = async () => {
+      try {
+        let status
+        try {
+          const res = await getPatientStationStatus(props.patientId)
+          status = res.data
+        } catch {
+          status = await loadLocalStatusFallback()
+        }
+
+        setFormDone(status)
+        setLoading(false)
+        isAdmins(await isAdmin())
+      } catch (err) {
+        alert(err)
+        navigate('/app/registration', { replace: true })
+      }
+    }
     createFormsStatus()
   }, [navigate, props.patientId])
   if (loading) {

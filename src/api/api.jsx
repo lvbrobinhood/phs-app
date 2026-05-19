@@ -8,7 +8,7 @@ import updatedLogo from 'src/icons/UpdatedIcon'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 import { updateAllStationCounts } from '../services/stationCounts'
-import { parseFromLangKey, setLang, setLangUpdated } from './langutil'
+import { normalizeLangName, parseFromLangKey, setLang, setLangUpdated } from './langutil'
 
 import { addToFormAQueue, getSavedData, getSavedPatientData } from '../services/mongoDB'
 
@@ -19,7 +19,9 @@ import pic1 from '../icons/pic1-forma'
 import pic2 from '../icons/pic2-forma'
 import { getEligibilityRows } from '../services/stationCounts'
 
-import { apiPost } from '../apiClient.js'
+import { createPatient } from './patientsApi'
+import { submitPatientForm } from './formsApi'
+import { toFormKey } from '../forms/formKeys'
 
 pdfMake.vfs = pdfFonts.vfs
 
@@ -192,7 +194,7 @@ export async function submitForm(args, patientId, formCollection) {
         age: Number(args.registrationQ4 ?? 0),
         preferredLanguage: (args.registrationQ14 || '').trim(),
       }
-      const created = await apiPost('/patients', payload)
+      const created = await createPatient(payload)
       if (!created?.result) return { result: false, error: 'Failed to create patient' }
       effectiveId = created.data.queueNo
       patientData = payload
@@ -206,12 +208,7 @@ export async function submitForm(args, patientId, formCollection) {
     }
 
     // Upsert form data
-    const upsert = await apiPost(
-      `/forms/${encodeURIComponent(formCollection)}/${encodeURIComponent(effectiveId)}`,
-      {
-        data: args,
-      },
-    )
+    const upsert = await submitPatientForm(effectiveId, toFormKey(formCollection), args)
     if (!upsert?.result) return { result: false, error: 'Failed to save form' }
 
     // Return same shape expected by frontend logic
@@ -1094,7 +1091,11 @@ export function generate_pdf_updated(
   hpv,
 ) {
   console.log('TRIAGE', triage)
-  setLangUpdated(reg.registrationQ14)
+  const language = normalizeLangName(reg?.registrationQ14)
+  const reportFont =
+    language === 'tamil' ? 'NotoTamil' : language === 'mandarin' ? 'PingFangSC' : 'Roboto'
+
+  setLangUpdated(language)
   let content = []
 
   content.push(...patientSection(reg, patients))
@@ -1165,55 +1166,30 @@ export function generate_pdf_updated(
     content: content,
     styles: {
       header: {
-        font:
-          reg.registrationQ14.toLowerCase() === 'tamil'
-            ? 'NotoTamil'
-            : reg.registrationQ14.toLowerCase() === 'mandarin'
-              ? 'PingFangSC'
-              : 'Roboto',
+        font: reportFont,
         fontSize: 16,
         bold: true,
         margin: [0, 10, 0, 5],
       },
       subheader: {
-        font:
-          reg.registrationQ14.toLowerCase() === 'tamil'
-            ? 'NotoTamil'
-            : reg.registrationQ14.toLowerCase() === 'mandarin'
-              ? 'PingFangSC'
-              : 'Roboto',
+        font: reportFont,
         fontSize: 13,
         bold: true,
         margin: [0, 3, 0, 3],
       },
       normal: {
-        font:
-          reg.registrationQ14.toLowerCase() === 'tamil'
-            ? 'NotoTamil'
-            : reg.registrationQ14.toLowerCase() === 'mandarin'
-              ? 'PingFangSC'
-              : 'Roboto',
+        font: reportFont,
         fontSize: 10,
         margin: [0, 0, 0, 4],
       },
       italicSmall: {
-        font:
-          reg.registrationQ14.toLowerCase() === 'tamil'
-            ? 'NotoTamil'
-            : reg.registrationQ14.toLowerCase() === 'mandarin'
-              ? 'PingFangSC'
-              : 'Roboto',
+        font: reportFont,
         italics: true,
         fontSize: 10,
       },
     },
     defaultStyle: {
-      font:
-        reg.registrationQ14.toLowerCase() === 'tamil'
-          ? 'NotoTamil'
-          : reg.registrationQ14.toLowerCase() === 'mandarin'
-            ? 'PingFangSC'
-            : 'Roboto',
+      font: reportFont,
       fontSize: 11,
     },
     pageMargins: [40, 60, 40, 60],

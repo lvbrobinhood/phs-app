@@ -1,4 +1,4 @@
-import { apiGet } from '../apiClient'
+import { apiGet, apiPost } from '../apiClient'
 
 export function getStations() {
   return apiGet('/stations')
@@ -14,4 +14,8 @@ export function getPatientStationSummary(patientId) {
 
 export function getPatientStationEligibility(patientId) {
   return apiGet(`/patients/${encodeURIComponent(patientId)}/station-eligibility`)
+}
+
+export function recalculatePatientStationCounts(patientId) {
+  return apiPost(`/patients/${encodeURIComponent(patientId)}/station-counts/recalculate`, {})
 }

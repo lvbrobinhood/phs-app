@@ -1,5 +1,9 @@
 import allForms from '../forms/forms.json'
-import { getPatientStationEligibility, getPatientStationSummary } from '../api/stationsApi'
+import {
+  getPatientStationEligibility,
+  getPatientStationSummary,
+  recalculatePatientStationCounts,
+} from '../api/stationsApi'
 import { getSavedData, getSavedPatientData, updateStationCounts } from './mongoDB'
 
 export const getEligibilityRows = (forms = {}) => {
@@ -125,7 +129,7 @@ export function computeVisitedStationsCount(record) {
     mentalhealth: ['mentalHealthForm'],
     mammobus: ['mammobusForm'],
     hpv: ['hpvForm'],
-    geriaudio: ['geriAudiometryForm'],
+    geriaudio: ['audiometryForm'],
     vax: ['vaccineForm'],
     doctorsconsult: ['doctorConsultForm'],
   }
@@ -148,6 +152,21 @@ export function computeVisitedStationsCount(record) {
 
 // compute and update visited and eligible station counts
 export const updateAllStationCounts = async (patientId) => {
+  try {
+    const recalculated = await recalculatePatientStationCounts(patientId)
+    console.log(
+      'visited:',
+      recalculated.data?.visitedStationCount,
+      'eligible:',
+      recalculated.data?.eligibleStationCount,
+    )
+    console.log('eligible stations:', recalculated.data?.eligibleStations || [])
+    console.log('visited stations:', recalculated.data?.visitedStations || [])
+    return
+  } catch {
+    // Keep the legacy client-side calculation as a migration fallback.
+  }
+
   // fetch patient record (used for visited station logic)
   const patient = await getSavedPatientData(patientId, 'patients')
   let eligibleStations = []
@@ -272,7 +291,7 @@ export const getVisitedStationNames = (record) => {
     'Mental Health': ['mentalHealthForm'],
     Mammobus: ['mammobusForm'],
     'HPV On-Site Testing': ['hpvForm'],
-    Audiometry: ['geriAudiometryForm'],
+    Audiometry: ['audiometryForm'],
     Vaccination: ['vaccineForm'],
     "Doctor's Station": ['doctorConsultForm'],
   }

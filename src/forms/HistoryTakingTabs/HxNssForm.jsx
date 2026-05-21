@@ -9,7 +9,7 @@ import CustomTextField from 'src/components/form-components/CustomTextField.jsx'
 import CustomCheckboxGroup from '../../components/form-components/CustomCheckboxGroup'
 import CustomRadioGroup from '../../components/form-components/CustomRadioGroup'
 import ErrorNotification from '../../components/form-components/ErrorNotification'
-import { getSavedData } from '../../services/mongoDB'
+import { getSavedData } from '../../services/patientData'
 import allForms from '../forms.json'
 
 // IMPORTANT: Formerly NSS, renamed to PMHX as of PHS 2022. MongoDB forms not renamed, only tab name

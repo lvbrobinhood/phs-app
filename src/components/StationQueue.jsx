@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import {
-  getQueueCollection,
-  getPreRegDataById,
-  getSavedData,
-  getProfile,
-} from '../services/mongoDB'
+  addPatientsToStationQueue,
+  createStationQueue,
+  deleteStationQueue,
+  getQueueEntries,
+  removeFirstPatientFromStationQueue,
+  removePatientsFromStationQueue,
+} from '../api/queuesApi'
+import { getProfile } from '../services/authSession'
+import { getPreRegDataById, getSavedData } from '../services/patientData'
 import { Box, Button, Typography, TextField, CircularProgress, Tooltip } from '@mui/material'
 import allForms from '../forms/forms.json'
 
@@ -45,13 +49,7 @@ const StationQueue = () => {
       return
     }
 
-    const sq = getQueueCollection()
-    const station = {
-      stationName,
-      queueItems: [],
-    }
-
-    await sq.insertOne(station)
+    await createStationQueue(stationName)
     setRefresh(!refresh)
     setStationName('')
     isLoading(false)
@@ -62,8 +60,7 @@ const StationQueue = () => {
     event.preventDefault()
     isLoading(true)
 
-    const sq = getQueueCollection()
-    await sq.deleteOne({ stationName })
+    await deleteStationQueue(stationName)
     setRefresh(!refresh)
     isLoading(false)
   }
@@ -107,12 +104,7 @@ const StationQueue = () => {
     }
 
     const patientStrings = await getPatientStrings(patientIds)
-    const sq = getQueueCollection()
-    await sq.findOneAndUpdate(
-      { stationName },
-      { $push: { queueItems: { $each: patientStrings } } },
-      { upsert: true },
-    )
+    await addPatientsToStationQueue(stationName, patientStrings)
     setRefresh(!refresh)
     setStationAddPatientId({ ...stationPatientAddId, [stationName]: '' })
     isLoading(false)
@@ -151,10 +143,7 @@ const StationQueue = () => {
     }
 
     const patientStrings = await getPatientStrings(patientIds)
-    const sq = getQueueCollection()
-    // Read MongoDB documentation here:
-    // https://www.mongodb.com/docs/manual/reference/operator/update/pullAll/
-    await sq.findOneAndUpdate({ stationName }, { $pullAll: { queueItems: patientStrings } })
+    await removePatientsFromStationQueue(stationName, patientStrings)
 
     setRefresh(!refresh)
     setStationRemovePatientId({ ...stationPatientRemoveId, [stationName]: '' })
@@ -166,9 +155,7 @@ const StationQueue = () => {
     event.preventDefault()
     isLoading(true)
 
-    const sq = getQueueCollection()
-
-    await sq.findOneAndUpdate({ stationName }, { $pop: { queueItems: -1 } }, { upsert: true })
+    await removeFirstPatientFromStationQueue(stationName)
     setRefresh(!refresh)
     isLoading(false)
   }
@@ -176,9 +163,8 @@ const StationQueue = () => {
   // Set a listener to update the station queues when the refresh state changes
   useEffect(() => {
     const updateStationQueue = async () => {
-      const collection = getQueueCollection()
-      const sq = await collection.find()
-      setStationQueues(sq)
+      const response = await getQueueEntries()
+      setStationQueues(response.data || [])
     }
     updateStationQueue()
   }, [refresh])

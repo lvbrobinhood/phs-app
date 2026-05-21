@@ -1,7 +1,5 @@
-import mongoDB, { getName, isAdmin } from '../services/mongoDB'
-import { updateAllStationCounts } from '../services/stationCounts'
-
-import { addToFormAQueue, getSavedData, getSavedPatientData } from '../services/mongoDB'
+import { getSavedPatientData } from '../services/patientData'
+import { addToFormAQueue } from '../services/printQueues'
 
 import { generateStatusObject } from 'src/components/dashboard/PatientTimeline'
 
@@ -213,33 +211,6 @@ export async function submitForm(args, patientId, formCollection) {
     }
   } catch (err) {
     return { result: false, error: err.message || String(err) }
-  }
-}
-
-// UNUSED IN 2025, not sure what is the purpose of this
-export async function submitPreRegForm(args, patientId, formCollection) {
-  try {
-    const mongoConnection = mongoDB.currentUser.mongoClient('mongodb-atlas')
-    const patientsRecord = mongoConnection.db('phs').collection(formCollection)
-    const record = await patientsRecord.findOne({ queueNo: patientId })
-    if (record) {
-      if (await isAdmin()) {
-        args.lastEdited = new Date()
-        args.lastEditedBy = getName()
-        await patientsRecord.updateOne({ queueNo: patientId }, { $set: { ...args } })
-        return { result: true, data: args }
-      } else {
-        const errorMsg =
-          'This form has already been submitted. If you need to make ' +
-          'any changes, please contact the admin.'
-        return { result: false, error: errorMsg }
-      }
-    } else {
-      const errorMsg = 'An error has occurred.'
-      return { result: false, error: errorMsg }
-    }
-  } catch (e) {
-    return { result: false, error: e }
   }
 }
 
@@ -455,16 +426,6 @@ export const regexPasswordPattern =
 // deletes volunteer accounts
 // console.log(await mongoDBConnection.collection("profiles").deleteMany({is_admin:{$eq : undefined}}))
 // }
-
-async function updateGeriGraceEligibility(args, patientId, formCollection, patientsRecord) {
-  if (formCollection == 'geriAmtForm') {
-    const eligibleForGrace = args.geriAmtQ12 === 'Yes (Eligible for G-RACE)'
-    await patientsRecord.updateOne(
-      { queueNo: patientId },
-      { $set: { isEligibleForGrace: eligibleForGrace } },
-    )
-  }
-}
 
 export const checkFormA = async (patientId) => {
   const patient = await getSavedPatientData(patientId, 'patients')

@@ -3,7 +3,7 @@ import { checkedBox, uncheckedBox } from '../icons/checked'
 import pic1 from '../icons/pic1-forma'
 import pic2 from '../icons/pic2-forma'
 import { getPatientStationEligibility } from '../api/stationsApi'
-import { getSavedData, getSavedPatientData } from '../services/mongoDB'
+import { getSavedData, getSavedPatientData } from '../services/patientData'
 import pdfMake from './pdfMake'
 
 export const generateFormAPdf = async (patientId) => {

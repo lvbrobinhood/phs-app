@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Button, CircularProgress, Typography, Paper, Stack } from '@mui/material'
-import { getProfile, getPrintedDocPdfQueue, getUnprintedDocPdfQueue, markDocPdfAsPrinted, deleteDocPdfFromQueue } from '../services/mongoDB'
+import { getProfile } from '../services/authSession'
+import {
+  deleteDocPdfFromQueue,
+  getPrintedDocPdfQueue,
+  getUnprintedDocPdfQueue,
+  markDocPdfAsPrinted,
+} from '../services/printQueues'
 import { generateDoctorPdf } from '../api/api.jsx'
 
 const DoctorAdmin = () => {

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, TextField, Button, InputAdornment, IconButton } from '@mui/material'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
-import { isAdmin, profilesCollection } from '../services/mongoDB'
+import { isAdmin } from '../services/authSession'
+import { getProfiles } from '../api/profilesApi'
 import { Visibility, VisibilityOff, Search } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { regexPasswordPattern as pattern } from '../api/api'
@@ -28,7 +29,8 @@ const ManageVolunteers = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (await isAdmin()) {
-        const profiles = await profilesCollection('profiles')
+        const profilesResponse = await getProfiles()
+        const profiles = profilesResponse.data || []
         const guestProfiles = await profiles.filter(p => !p.is_admin)
         setGuestUsers(guestProfiles)
       } else {

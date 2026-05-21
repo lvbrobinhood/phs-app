@@ -10,7 +10,7 @@ import ErrorNotification from '../../components/form-components/ErrorNotificatio
 
 import { submitForm, calculateSppbScore } from '../../api/api.jsx'
 import { FormContext } from '../../api/utils.js'
-import { getSavedData } from '../../services/mongoDB'
+import { getSavedData } from '../../services/patientData'
 import '../fieldPadding.css'
 
 const formName = 'geriSppbForm'

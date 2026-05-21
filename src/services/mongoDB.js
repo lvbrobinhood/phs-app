@@ -2,6 +2,23 @@ import * as Realm from 'realm-web'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../apiClient'
 import { getPatient, getPatientNames, searchPatientsByInitials } from '../api/patientsApi'
 import { getPatientForm } from '../api/formsApi'
+import {
+  getCollection,
+  getCollectionPatientNames,
+  getRecordByDocumentId,
+  getRecordByInitials,
+  getRecordByPatientId,
+} from '../api/collectionsApi'
+import {
+  getCurrentProfile,
+  getProfiles,
+  getVolunteerProfileCount,
+} from '../api/profilesApi'
+import {
+  getQueueCounters,
+  getQueueEntries,
+  updatePhlebotomyQueueCounter,
+} from '../api/queuesApi'
 import { hasFormKey, toFormKey } from '../forms/formKeys'
 
 const REALM_APP_ID = import.meta.env.VITE_MONGO_KEY
@@ -50,6 +67,10 @@ export const logOut = async () => {
 
 export const guestUserCount = async (collection = 'profiles') => {
   try {
+    if (collection === 'profiles') {
+      const data = await getVolunteerProfileCount()
+      return data.count || 0
+    }
     const data = await apiGet(`/guestUserCount?collection=${encodeURIComponent(collection)}`)
     return data.count || 0
   } catch (error) {
@@ -76,7 +97,7 @@ export const hashPassword = async (password) => {
 export const profilesCollection = async (collection = 'profiles') => {
   if (!isLoggedin()) return null
   try {
-    const res = await apiGet(`/getCollection?collection=${encodeURIComponent(collection)}`)
+    const res = collection === 'profiles' ? await getProfiles() : await getCollection(collection)
     return res.data || []
   } catch {
     return null
@@ -91,7 +112,7 @@ export const profilesCollection = async (collection = 'profiles') => {
 
 export const getQueueCollection = async (collection = 'queue') => {
   try {
-    const res = await apiGet(`/getCollection?collection=${encodeURIComponent(collection)}`)
+    const res = collection === 'queue' ? await getQueueEntries() : await getCollection(collection)
     return res.data || []
   } catch {
     return null
@@ -114,7 +135,7 @@ export const getQueueCollection = async (collection = 'queue') => {
 export const getProfile = async () => {
   if (!isLoggedin()) return null;
   try {
-    const data = await apiGet('/profile');
+    const data = await getCurrentProfile();
     return data.user;
   } catch {
     return null;
@@ -157,7 +178,7 @@ export const getAllPatientNames = async (collectionName) => {
       const res = await getPatientNames()
       return res.data || []
     }
-    const res = await apiGet(`/patientNames?collection=${encodeURIComponent(collectionName)}`)
+    const res = await getCollectionPatientNames(collectionName)
     return res.data || []
   } catch {
     return []
@@ -178,9 +199,7 @@ export const getSavedData = async (patientId, collectionName) => {
       const res = await getPatientForm(patientId, toFormKey(collectionName))
       return res.data || {}
     }
-    const res = await apiGet(
-      `/savedData?patientId=${encodeURIComponent(patientId)}&collectionName=${encodeURIComponent(collectionName)}`
-    )
+    const res = await getRecordByDocumentId(patientId, collectionName)
     return res.data || {}
   } catch {
     return {}
@@ -197,7 +216,7 @@ export const getPreRegDataById = async (patientId, collectionName) => {
       const res = await getPatientForm(patientId, toFormKey(collectionName))
       return res.data || {}
     }
-    const res = await apiGet(`/patients/${patientId}?collection=${encodeURIComponent(collectionName)}`)
+    const res = await getRecordByPatientId(patientId, collectionName)
     return res.data || {}
   } catch {
     return {}
@@ -225,9 +244,7 @@ export const getPreRegDataByName = async (initials, collection) => {
       const res = await searchPatientsByInitials(initials)
       return res.data || {}
     }
-    const res = await apiGet(
-      `/patients/by-initials/${encodeURIComponent(initials)}?collection=${encodeURIComponent(collection)}`
-    )
+    const res = await getRecordByInitials(initials, collection)
     return res.data || {}
   } catch {
     return {}
@@ -253,9 +270,7 @@ export const getSavedPatientData = async (patientId, collectionName) => {
       const res = await getPatientForm(patientId, toFormKey(collectionName))
       return res.data || {}
     }
-    const res = await apiGet(
-      `/patientSavedData?patientId=${encodeURIComponent(patientId)}&collectionName=${encodeURIComponent(collectionName)}`
-    )
+    const res = await getRecordByPatientId(patientId, collectionName)
     return res.data || {}
   } catch {
     return {}
@@ -270,7 +285,7 @@ export const getSavedPatientData = async (patientId, collectionName) => {
 
 export const getClinicSlotsCollection = async (collection = 'queueCounters') => {
   try {
-    const data = await apiGet(`/getCollection?collection=${encodeURIComponent(collection)}`);
+    const data = collection === 'queueCounters' ? await getQueueCounters() : await getCollection(collection);
     return data.data || [];
   } catch {
     return [];
@@ -290,7 +305,7 @@ export const getClinicSlotsCollection = async (collection = 'queueCounters') => 
 export const updatePhlebotomyCounter = async (seq) => {
   if (!isLoggedin()) return false
   try {
-    await apiPost('/updatePhlebotomyCounter', { seq })
+    await updatePhlebotomyQueueCounter(seq)
     return true
   } catch {
     return false

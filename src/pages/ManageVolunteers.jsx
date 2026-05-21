@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, TextField, Button, InputAdornment, IconButton } from '@mui/material'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
-import { hashPassword, isAdmin, profilesCollection } from '../services/mongoDB'
+import { isAdmin, profilesCollection } from '../services/mongoDB'
 import { Visibility, VisibilityOff, Search } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { regexPasswordPattern as pattern } from '../api/api'
@@ -146,9 +146,8 @@ const ManageVolunteers = () => {
       return
     }
     isLoadingReset(true)
-    const hashHex = await hashPassword(resetPassword)
     try {
-      const data = await resetPasswordRequest(nameReset, hashHex)
+      const data = await resetPasswordRequest(nameReset, resetPassword)
       if (!data.result) {
         alert('Error resetting password!: ' + data.error);
       } else {

@@ -1,5 +1,5 @@
 import updatedLogo from 'src/icons/UpdatedIcon'
-import { getSavedData } from '../services/mongoDB'
+import { getSavedData } from '../services/patientData'
 import pdfMake from './pdfMake'
 
 export const generateDoctorPdf = async (entry) => {

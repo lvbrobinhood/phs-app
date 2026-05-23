@@ -13,7 +13,7 @@ import {
 import NavItem from './NavItem'
 import { FormContext } from 'src/api/utils'
 import { useNavigate } from 'react-router-dom'
-import { logOut } from '../services/mongoDB'
+import { logOut } from '../services/authSession'
 
 const title1 = 'Patient Dashboard'
 const items = [

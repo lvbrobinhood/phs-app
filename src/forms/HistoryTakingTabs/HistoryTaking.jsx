@@ -16,7 +16,7 @@ import HxOralForm from './HxOralForm.jsx'
 import HxPhqForm from './HxPhqForm.jsx'
 import HxSocialForm from './HxSocialForm.jsx'
 import allForms from '../forms.json'
-import { getSavedData } from '../../services/mongoDB.js'
+import { getSavedData } from '../../services/patientData'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props

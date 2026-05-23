@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Box, Typography, TextField, Button, InputAdornment, SvgIcon } from '@mui/material'
-import { isAdmin, getPreRegDataById } from '../services/mongoDB'
+import { isAdmin } from '../services/authSession'
+import { getPreRegDataById } from '../services/patientData'
 import { useNavigate } from 'react-router-dom'
 import { Search as SearchIcon } from 'react-feather'
 import { FormContext } from '../api/utils'

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAllPatientNames, getPreRegDataById, getPreRegDataByName } from '../services/mongoDB'
+import { getAllPatientNames, getPreRegDataById, getPreRegDataByName } from '../services/patientData'
 import { FormContext } from '../api/utils.js'
 import {
   Box,

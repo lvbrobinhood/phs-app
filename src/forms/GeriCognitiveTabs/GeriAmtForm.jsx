@@ -11,7 +11,7 @@ import CustomNumberField from '../../components/form-components/CustomNumberFiel
 import CustomRadioGroup from '../../components/form-components/CustomRadioGroup'
 import ErrorNotification from '../../components/form-components/ErrorNotification'
 
-import { getSavedData } from '../../services/mongoDB'
+import { getSavedData } from '../../services/patientData'
 
 import '../fieldPadding.css'
 import '../forms.css'
